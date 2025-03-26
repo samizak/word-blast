@@ -47,8 +47,21 @@ export default function WordBlastGame() {
 
     const currentWordList =
       wordLists[Math.min(level - 1, wordLists.length - 1)];
-    const word =
-      currentWordList[Math.floor(Math.random() * currentWordList.length)];
+    
+    // Get all words currently on screen
+    const activeWords = aliens.map(alien => alien.word);
+    
+    // Filter out words that are already on screen
+    const availableWords = currentWordList.filter(word => !activeWords.includes(word));
+    
+    // If all words are already on screen, wait for next cycle
+    if (availableWords.length === 0) {
+      console.log("All words from current list are on screen. Waiting...");
+      return;
+    }
+    
+    // Select a random word from available words
+    const word = availableWords[Math.floor(Math.random() * availableWords.length)];
 
     // Get container width with a fallback value
     const containerWidth = gameContainerRef.current?.clientWidth || 800;
