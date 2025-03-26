@@ -8,11 +8,32 @@ import GamePlayArea from "./game/GamePlayArea";
 import GameOver from "./game/GameOver";
 import MuteButton from "./game/MuteButton";
 import wordLists from "../data/wordLists";
-import { Alien, Effect, GameState } from "../types/game";
-import { useGameSound } from "../hooks/useGameSound";
+
+// Define types for the alien object
+interface Alien {
+  id: number;
+  word: string;
+  x: number;
+  y: number;
+  speed: number;
+}
+
+// Define types for visual effects
+interface Effect {
+  id: string;
+  type: "laser" | "explosion";
+  startX?: number;
+  startY?: number;
+  endX?: number;
+  endY?: number;
+  x?: number;
+  y?: number;
+}
 
 export default function WordBlastGame() {
-  const [gameState, setGameState] = useState<GameState>("start");
+  const [gameState, setGameState] = useState<
+    "start" | "countdown" | "playing" | "gameOver"
+  >("start");
   const [countdown, setCountdown] = useState<number>(3);
   const [level, setLevel] = useState(1);
   const [score, setScore] = useState(0);
@@ -26,7 +47,6 @@ export default function WordBlastGame() {
   const playerRef = useRef<HTMLDivElement | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   const canPlayCountdownSound = useRef(true);
-  const { playSound, playLoopingSound } = useGameSound(isMuted, gameState);
 
   // Start the game
   const startGame = () => {
@@ -39,7 +59,7 @@ export default function WordBlastGame() {
     setCurrentInput("");
     setGameSpeed(2000);
     setEffects([]);
-    setCountdown(3);
+    canPlayCountdownSound.current = true;
   };
 
   // Handle countdown
@@ -47,7 +67,7 @@ export default function WordBlastGame() {
     if (gameState === "countdown") {
       if (countdown > 0) {
         if (canPlayCountdownSound.current) {
-          playSound("countdown");
+          window.playSound?.("countdown");
           canPlayCountdownSound.current = false;
         }
 
@@ -57,8 +77,8 @@ export default function WordBlastGame() {
 
         return () => clearTimeout(timer);
       } else {
-        playSound("levelUp");
-        playLoopingSound("atmosphere");
+        window.playSound?.("levelUp");
+        window.playLoopingSound?.("atmosphere");
 
         const startGameTimer = setTimeout(() => {
           setGameState("playing");
@@ -71,7 +91,7 @@ export default function WordBlastGame() {
         return () => clearTimeout(startGameTimer);
       }
     }
-  }, [gameState, countdown, playSound, playLoopingSound]);
+  }, [gameState, countdown]);
 
   // Generate a new alien with a word
   const generateAlien = () => {
@@ -138,7 +158,7 @@ export default function WordBlastGame() {
       .toString(36)
       .substr(2, 9)}`;
 
-    playSound("laser");
+    window.playSound?.("laser");
 
     setEffects((prev) => [
       ...prev,
@@ -153,7 +173,7 @@ export default function WordBlastGame() {
     ]);
 
     setTimeout(() => {
-      playSound("explosion");
+      window.playSound?.("explosion");
 
       setEffects((prev) => [
         ...prev,
@@ -195,7 +215,7 @@ export default function WordBlastGame() {
         setCurrentInput("");
 
         if (newLevel > oldLevel) {
-          playSound("levelUp");
+          window.playSound?.("levelUp");
           setLevel((prev) => prev + 1);
           setGameSpeed((prev) => Math.max(prev * 0.8, 1000));
         }
@@ -248,9 +268,10 @@ export default function WordBlastGame() {
   useEffect(() => {
     if (lives <= 0) {
       setGameState("gameOver");
-      playSound("gameOver");
+      window.playSound?.("gameOver");
+      window.stopLoopingSound?.("atmosphere");
     }
-  }, [lives, playSound]);
+  }, [lives]);
 
   // Focus input when game starts
   useEffect(() => {
@@ -261,8 +282,23 @@ export default function WordBlastGame() {
 
   // Handle mute functionality
   const toggleMute = () => {
-    setIsMuted((prev) => !prev);
+    const newMuteState = !isMuted;
+    setIsMuted(newMuteState);
+
+    if (!newMuteState && gameState === "playing") {
+      window.playLoopingSound?.("atmosphere");
+    }
   };
+
+  useEffect(() => {
+    if (gameState === "playing") {
+      if (isMuted) {
+        window.stopLoopingSound?.("atmosphere");
+      } else {
+        window.playLoopingSound?.("atmosphere");
+      }
+    }
+  }, [isMuted, gameState]);
 
   return (
     <div className="game-container" ref={gameContainerRef}>
