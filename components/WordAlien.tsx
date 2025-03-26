@@ -4,10 +4,12 @@ export default function WordAlien({
   word,
   x,
   y,
+  currentInput = '',
 }: {
   word: string;
   x: number;
   y: number;
+  currentInput?: string;
 }) {
   // Array of planet types
   const planetTypes = ['rocky', 'gas', 'ice', 'lava', 'earth', 'ringed'] as const;
@@ -28,7 +30,12 @@ export default function WordAlien({
         top: `${y}px`,
       }}
     >
-      <PlanetShape type={planetType} size={baseSize} word={word} />
+      <PlanetShape 
+        type={planetType} 
+        size={baseSize} 
+        word={word} 
+        currentInput={currentInput}
+      />
     </div>
   );
 }
