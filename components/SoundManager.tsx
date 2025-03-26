@@ -7,16 +7,21 @@ interface SoundManagerProps {
 }
 
 const SoundManager = ({ isMuted = false }: SoundManagerProps) => {
-  // Add countdown sound back to the sound URLs
+  // Add sound URLs
   const soundUrls = useRef({
     laser: '/sounds/laser.mp3',
     explosion: '/sounds/explosion.mp3',
     levelUp: '/sounds/levelup.mp3',
     gameOver: '/sounds/gameover.mp3',
     countdown: '/sounds/countdown.mp3',
-    go: '/sounds/go.mp3'  // Add a new sound for "GO!"
+    go: '/sounds/go.mp3',
+    atmosphere: '/sounds/atmosphere.mp3'  // Add atmosphere sound
   });
+  
+  // Keep track of looping sounds
+  const loopingSounds = useRef<{[key: string]: HTMLAudioElement}>({});
 
+  // Effect for handling sound functions
   useEffect(() => {
     // Expose sound functions globally
     window.playSound = (soundType: string) => {
@@ -42,13 +47,78 @@ const SoundManager = ({ isMuted = false }: SoundManagerProps) => {
       }
     };
 
+    // Add a function to play looping sounds
+    window.playLoopingSound = (soundType: string) => {
+      if (isMuted) return;
+      
+      // Stop existing looping sound of this type if it exists
+      if (loopingSounds.current[soundType]) {
+        loopingSounds.current[soundType].pause();
+        loopingSounds.current[soundType].remove();
+        delete loopingSounds.current[soundType];
+      }
+      
+      // Get the URL for the requested sound
+      const soundUrl = soundUrls.current[soundType as keyof typeof soundUrls.current];
+      
+      if (soundUrl) {
+        // Create a new Audio instance
+        const sound = new Audio(soundUrl);
+        sound.volume = 0.3; // Lower volume for background sounds
+        sound.loop = true;  // Enable looping
+        
+        // Store the sound for later reference
+        loopingSounds.current[soundType] = sound;
+        
+        // Play the sound
+        sound.play().catch(e => console.error(`Error playing looping ${soundType} sound:`, e));
+      }
+    };
+
+    // Add a function to stop looping sounds
+    window.stopLoopingSound = (soundType: string) => {
+      if (loopingSounds.current[soundType]) {
+        loopingSounds.current[soundType].pause();
+        loopingSounds.current[soundType].remove();
+        delete loopingSounds.current[soundType];
+      }
+    };
+
     // Cleanup
     return () => {
       if ('playSound' in window) {
         // @ts-ignore - Working around TypeScript limitation
         window.playSound = undefined;
       }
+      if ('playLoopingSound' in window) {
+        // @ts-ignore
+        window.playLoopingSound = undefined;
+      }
+      if ('stopLoopingSound' in window) {
+        // @ts-ignore
+        window.stopLoopingSound = undefined;
+      }
+      
+      // Stop and clean up all looping sounds
+      Object.keys(loopingSounds.current).forEach(soundType => {
+        loopingSounds.current[soundType].pause();
+        loopingSounds.current[soundType].remove();
+      });
+      loopingSounds.current = {};
     };
+  }, [isMuted]);
+
+  // Separate effect for handling mute state changes
+  useEffect(() => {
+    // Update all looping sounds when mute state changes
+    Object.keys(loopingSounds.current).forEach(soundType => {
+      if (isMuted) {
+        loopingSounds.current[soundType].pause();
+      } else {
+        loopingSounds.current[soundType].play()
+          .catch(e => console.error(`Error resuming ${soundType} sound:`, e));
+      }
+    });
   }, [isMuted]);
 
   return null; // This component doesn't render anything
@@ -58,6 +128,8 @@ const SoundManager = ({ isMuted = false }: SoundManagerProps) => {
 declare global {
   interface Window {
     playSound?: (soundType: string) => void;
+    playLoopingSound?: (soundType: string) => void;
+    stopLoopingSound?: (soundType: string) => void;
   }
 }
 

@@ -7,6 +7,7 @@ import Laser from "./Laser";
 import Explosion from "./Explosion";
 import wordLists from "../data/wordLists";
 import SoundManager from "./SoundManager";
+import { Volume2, VolumeX } from "lucide-react";
 
 // Define types for the alien object
 interface Alien {
@@ -79,6 +80,9 @@ export default function WordBlastGame() {
       } else {
         // Play the level up sound for "GO!" with null check
         window.playSound?.("levelUp");
+
+        // Start playing the atmosphere sound in a loop
+        window.playLoopingSound?.("atmosphere");
 
         // Start the actual game after a brief delay
         const startGameTimer = setTimeout(() => {
@@ -352,24 +356,47 @@ export default function WordBlastGame() {
     }
   }, [gameState]);
 
-  // Add the toggleMute function
+  // Update the toggleMute function
   const toggleMute = () => {
-    setIsMuted((prev) => !prev);
+    const newMuteState = !isMuted;
+    setIsMuted(newMuteState);
+    
+    // If we're unmuting and the game is playing, restart the atmosphere sound
+    if (!newMuteState && gameState === "playing") {
+      window.playLoopingSound?.("atmosphere");
+    }
   };
+  
+  // Add a new effect to handle mute state changes for looping sounds
+  useEffect(() => {
+    // When mute state changes, handle looping sounds
+    if (gameState === "playing") {
+      if (isMuted) {
+        window.stopLoopingSound?.("atmosphere");
+      } else {
+        window.playLoopingSound?.("atmosphere");
+      }
+    }
+  }, [isMuted, gameState]);
 
   return (
     <div className="game-container" ref={gameContainerRef}>
       {/* Add Sound Manager */}
       <SoundManager isMuted={isMuted} />
 
-      {/* Add mute button */}
+      {/* Replace text emoji with SVG icons */}
       <button
         className="mute-button"
         onClick={toggleMute}
         aria-label={isMuted ? "Unmute" : "Mute"}
       >
-        {isMuted ? "🔇" : "🔊"}
+        {isMuted ? (
+          <VolumeX size={32} color="#ffffff" strokeWidth={2} />
+        ) : (
+          <Volume2 size={32} color="#ffffff" strokeWidth={2} />
+        )}
       </button>
+      
       {gameState === "start" && (
         <div className="flex flex-col items-center justify-center h-full">
           <h2 className="text-3xl mb-4">Word Blast</h2>
