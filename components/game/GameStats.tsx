@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { getHighestScore } from "../../utils/highScore";
 
 interface GameStatsProps {
   level: number;
@@ -26,6 +27,7 @@ function HeartIcon({ filled }: { filled: boolean }) {
 export default function GameStats({ level, score, lives }: GameStatsProps) {
   const [isLevelAnimating, setIsLevelAnimating] = useState(false);
   const [prevLevel, setPrevLevel] = useState(level);
+  const highestScore = getHighestScore();
 
   useEffect(() => {
     if (level !== prevLevel) {
@@ -120,6 +122,39 @@ export default function GameStats({ level, score, lives }: GameStatsProps) {
           {score.toLocaleString()}
         </div>
       </div>
+
+      {/* High Score Display */}
+      {highestScore && (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <div
+            style={{
+              color: "#888",
+              fontSize: "0.8em",
+              textTransform: "uppercase",
+              letterSpacing: "1px",
+              marginBottom: "4px",
+            }}
+          >
+            High Score
+          </div>
+          <div
+            style={{
+              color: "#00ffaa",
+              fontSize: "1.5em",
+              fontWeight: "bold",
+              textShadow: "0 0 10px rgba(0, 255, 170, 0.5)",
+            }}
+          >
+            {highestScore.score.toLocaleString()}
+          </div>
+        </div>
+      )}
 
       {/* Lives Display */}
       <div
