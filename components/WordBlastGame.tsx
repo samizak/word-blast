@@ -28,6 +28,7 @@ interface Alien {
   x: number;
   y: number;
   speed: number;
+  isCompleted?: boolean;
 }
 
 // Define types for visual effects
@@ -248,34 +249,34 @@ export default function WordBlastGame() {
 
     aliens.forEach((alien) => {
       if (alien.word.toLowerCase() === inputValue) {
+        // Create laser and explosion effects
         createEffects(alien);
-        setAliens((prev) => prev.filter((a) => a.id !== alien.id));
 
-        const wordPoints = alien.word.length * 10;
-        const newScore = score + wordPoints;
+        // Mark the alien as completed and trigger explosion
+        setAliens((prev) =>
+          prev.map((a) => (a.id === alien.id ? { ...a, isCompleted: true } : a))
+        );
 
-        const oldLevel = Math.floor(score / GAME_CONFIG.pointsPerLevel);
-        const newLevel = Math.floor(newScore / GAME_CONFIG.pointsPerLevel);
+        // Remove the alien after explosion animation
+        setTimeout(() => {
+          setAliens((prev) => prev.filter((a) => a.id !== alien.id));
+        }, 1000);
 
-        setScore(newScore);
-        setCurrentInput("");
-
-        // Level up logic
-        if (newLevel > oldLevel) {
-          window.playSound?.("levelUp");
-          setLevel((prev) => prev + 1);
-          setWordsInLevel(0); // Reset words count for new level
-          setGameSpeed(getSpawnIntervalForLevel(newLevel + 1));
-        }
-
-        // Check if level is complete
+        // Update score and check level completion
+        setScore((prev) => prev + alien.word.length * 10);
         const maxWords = getMaxWordsForLevel(level);
-        if (wordsInLevel >= maxWords && aliens.length === 0) {
+
+        if (wordsInLevel >= maxWords) {
+          window.stopLoopingSound?.("atmosphere");
           window.playSound?.("levelUp");
           setLevel((prev) => prev + 1);
           setWordsInLevel(0);
           setGameSpeed(getSpawnIntervalForLevel(level + 1));
+          window.playLoopingSound?.("atmosphere");
         }
+
+        setCurrentInput("");
+        e.target.value = "";
       }
     });
   };
