@@ -18,7 +18,7 @@ export default function WordBlastGame() {
   const [gameState, setGameState] = useState<"start" | "playing" | "gameOver">(
     "start"
   );
-  const [level, setLevel] = useState(1);
+  const [level, setLevel] = useState(4);
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
   const [aliens, setAliens] = useState<Alien[]>([]);
@@ -30,8 +30,8 @@ export default function WordBlastGame() {
   // Start the game
   const startGame = () => {
     setGameState("playing");
-    setLevel(1);
-    setScore(0);
+    setLevel(20);
+    setScore(5000);
     setLives(3);
     setAliens([]);
     setCurrentInput("");
@@ -50,8 +50,28 @@ export default function WordBlastGame() {
     const word =
       currentWordList[Math.floor(Math.random() * currentWordList.length)];
 
+    // Get container width with a fallback value
     const containerWidth = gameContainerRef.current?.clientWidth || 800;
-    const xPosition = Math.random() * (containerWidth - 100) + 50;
+
+    // Calculate safe margins based on word length
+    // Base planet size is 80, but we need to account for longer words
+    const basePlanetSize = 80;
+    const charWidth = 8; // Approximate width of each character in pixels
+    const wordWidth = word.length * charWidth;
+    const padding = 20; // Extra padding around the text
+    
+    // Calculate the size needed to fit the word with padding
+    const planetSize = Math.max(basePlanetSize, wordWidth + padding);
+    
+    // Use the larger of the calculated planet size or a fixed margin
+    const safeMargin = Math.max(planetSize / 2, 50);
+
+    // Ensure planets spawn within safe boundaries
+    const minPosition = safeMargin;
+    const maxPosition = containerWidth - safeMargin;
+
+    // Generate position within safe boundaries
+    const xPosition = Math.random() * (maxPosition - minPosition) + minPosition;
 
     const newAlien: Alien = {
       id: Date.now(),
