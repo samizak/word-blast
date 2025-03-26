@@ -6,6 +6,7 @@ import Player from "./Player";
 import Laser from "./Laser";
 import Explosion from "./Explosion";
 import wordLists from "../data/wordLists";
+import SoundManager from "./SoundManager";
 
 // Define types for the alien object
 interface Alien {
@@ -18,7 +19,7 @@ interface Alien {
 
 // Define types for visual effects
 interface Effect {
-  id: number;
+  id: string; // Changed from number to string
   type: "laser" | "explosion";
   startX?: number;
   startY?: number;
@@ -43,6 +44,7 @@ export default function WordBlastGame() {
   const gameContainerRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const playerRef = useRef<HTMLDivElement | null>(null);
+  const [isMuted, setIsMuted] = useState(false);
 
   // Start the game
   const startGame = () => {
@@ -62,6 +64,9 @@ export default function WordBlastGame() {
   useEffect(() => {
     if (gameState === "countdown") {
       if (countdown > 0) {
+        // Re-add countdown sound with null check
+        window.playSound?.('countdown');
+        
         // Decrement countdown every second
         const timer = setTimeout(() => {
           setCountdown((prev) => prev - 1);
@@ -171,9 +176,13 @@ export default function WordBlastGame() {
     console.log("Target position:", targetX, targetY);
 
     // Create unique IDs for the effects
-    const laserId = Date.now();
-    const explosionId = laserId + 1;
+    // Use a combination of timestamp and random number to ensure uniqueness
+    const laserId = `laser-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const explosionId = `explosion-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
+    // Play laser sound with null check
+    window.playSound?.('laser');
+    
     // Add laser effect
     setEffects((prev) => [
       ...prev,
@@ -189,6 +198,9 @@ export default function WordBlastGame() {
 
     // Add explosion effect after a short delay
     setTimeout(() => {
+      // Play explosion sound with null check
+      window.playSound?.('explosion');
+      
       setEffects((prev) => [
         ...prev,
         {
@@ -214,6 +226,8 @@ export default function WordBlastGame() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value.toLowerCase();
     setCurrentInput(inputValue);
+
+    // Removed typing sound logic
 
     // Check if input matches any alien's word
     aliens.forEach((alien) => {
@@ -243,6 +257,9 @@ export default function WordBlastGame() {
         // Level up when crossing 250-point thresholds
         if (newLevel > oldLevel) {
           console.log(`LEVEL UP TRIGGERED! New level: ${level + 1}`);
+          // Play level up sound with null check
+          window.playSound?.('levelUp');
+          
           setLevel((prev) => {
             console.log(`Level changing from ${prev} to ${prev + 1}`);
             return prev + 1;
@@ -309,6 +326,8 @@ export default function WordBlastGame() {
   useEffect(() => {
     if (lives <= 0) {
       setGameState("gameOver");
+      // Play game over sound with null check
+      window.playSound?.('gameOver');
     }
   }, [lives]);
 
@@ -319,8 +338,24 @@ export default function WordBlastGame() {
     }
   }, [gameState]);
 
+  // Add the toggleMute function
+  const toggleMute = () => {
+    setIsMuted(prev => !prev);
+  };
+
   return (
     <div className="game-container" ref={gameContainerRef}>
+      {/* Add Sound Manager */}
+      <SoundManager isMuted={isMuted} />
+      
+      {/* Add mute button */}
+      <button 
+        className="mute-button" 
+        onClick={toggleMute}
+        aria-label={isMuted ? "Unmute" : "Mute"}
+      >
+        {isMuted ? "🔇" : "🔊"}
+      </button>
       {gameState === "start" && (
         <div className="flex flex-col items-center justify-center h-full">
           <h2 className="text-3xl mb-4">Word Blast</h2>
