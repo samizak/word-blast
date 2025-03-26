@@ -33,7 +33,7 @@ export default function WordBlastGame() {
     "start" | "countdown" | "playing" | "gameOver"
   >("start");
   const [countdown, setCountdown] = useState<number>(3);
-  const [level, setLevel] = useState(4);
+  const [level, setLevel] = useState(1);
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
   const [aliens, setAliens] = useState<Alien[]>([]);
@@ -48,8 +48,8 @@ export default function WordBlastGame() {
   const startGame = () => {
     setGameState("countdown");
     setCountdown(3);
-    setLevel(20);
-    setScore(5000);
+    setLevel(1);
+    setScore(0);
     setLives(3);
     setAliens([]);
     setCurrentInput("");
@@ -298,7 +298,10 @@ export default function WordBlastGame() {
 
     console.log(`Level changed to: ${level}, Game speed: ${gameSpeed}ms`);
 
-    const spawnInterval = setInterval(generateAlien, gameSpeed);
+    // Adjust game speed based on level
+    const adjustedGameSpeed = Math.max(gameSpeed + level * 100, 500);
+
+    const spawnInterval = setInterval(generateAlien, adjustedGameSpeed);
     return () => clearInterval(spawnInterval);
   }, [gameState, gameSpeed, level]);
 
