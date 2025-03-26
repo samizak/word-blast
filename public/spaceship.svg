@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Engine glow effects -->
+  <circle cx="16" cy="24" r="6" fill="url(#engineGlow)" filter="url(#blur)" />
+  
+  <!-- Main ship body -->
+  <path d="M16 4L24 20H8L16 4Z" fill="#4F46E5" />
+  <path d="M16 8L20 18H12L16 8Z" fill="#818CF8" />
+  
+  <!-- Side wings -->
+  <path d="M8 20L4 28H12L8 20Z" fill="#4F46E5" />
+  <path d="M24 20L28 28H20L24 20Z" fill="#4F46E5" />
+  
+  <!-- Engine exhaust -->
+  <path d="M14 20L16 28L18 20H14Z" fill="#60A5FA" />
+  
+  <!-- Window -->
+  <circle cx="16" cy="14" r="2" fill="#E0E7FF" />
+  
+  <!-- Definitions for effects -->
+  <defs>
+    <!-- Engine glow gradient -->
+    <radialGradient id="engineGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stopColor="#60A5FA" stopOpacity="0.6" />
+      <stop offset="100%" stopColor="#60A5FA" stopOpacity="0" />
+    </radialGradient>
+    
+    <!-- Blur filter for glow effect -->
+    <filter id="blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2" />
+    </filter>
+  </defs>
+</svg> 
