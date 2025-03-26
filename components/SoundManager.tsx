@@ -13,7 +13,8 @@ const SoundManager = ({ isMuted = false }: SoundManagerProps) => {
     explosion: '/sounds/explosion.mp3',
     levelUp: '/sounds/levelup.mp3',
     gameOver: '/sounds/gameover.mp3',
-    countdown: '/sounds/countdown.mp3'
+    countdown: '/sounds/countdown.mp3',
+    go: '/sounds/go.mp3'  // Add a new sound for "GO!"
   });
 
   useEffect(() => {
