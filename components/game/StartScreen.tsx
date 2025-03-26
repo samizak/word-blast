@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { getHighestScore } from "../../utils/highScore";
 
 interface StartScreenProps {
@@ -6,7 +6,15 @@ interface StartScreenProps {
 }
 
 export default function StartScreen({ onStartGame }: StartScreenProps) {
-  const highestScore = getHighestScore();
+  const [highestScore, setHighestScore] = useState<{
+    score: number;
+    level: number;
+  } | null>(null);
+
+  // Initialize high score on client side only
+  useEffect(() => {
+    setHighestScore(getHighestScore());
+  }, []);
 
   return (
     <div className="flex flex-col items-center justify-center h-full">
