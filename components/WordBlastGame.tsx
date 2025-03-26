@@ -45,6 +45,7 @@ export default function WordBlastGame() {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const playerRef = useRef<HTMLDivElement | null>(null);
   const [isMuted, setIsMuted] = useState(false);
+  const canPlayCountdownSound = useRef(true);
 
   // Start the game
   const startGame = () => {
@@ -64,9 +65,11 @@ export default function WordBlastGame() {
   useEffect(() => {
     if (gameState === "countdown") {
       if (countdown > 0) {
-        // Re-add countdown sound with null check
-        window.playSound?.('countdown');
-        
+        if (canPlayCountdownSound.current) {
+          window.playSound?.("countdown");
+          canPlayCountdownSound.current = false;
+        }
+
         // Decrement countdown every second
         const timer = setTimeout(() => {
           setCountdown((prev) => prev - 1);
@@ -74,12 +77,19 @@ export default function WordBlastGame() {
 
         return () => clearTimeout(timer);
       } else {
-        // Countdown is 0, start the actual game
-        setGameState("playing");
-        generateAlien();
-        if (inputRef.current) {
-          inputRef.current.focus();
-        }
+        // Play the level up sound for "GO!" with null check
+        window.playSound?.("levelUp");
+
+        // Start the actual game after a brief delay
+        const startGameTimer = setTimeout(() => {
+          setGameState("playing");
+          generateAlien();
+          if (inputRef.current) {
+            inputRef.current.focus();
+          }
+        }, 800); // Give time for the "GO!" sound and animation
+
+        return () => clearTimeout(startGameTimer);
       }
     }
   }, [gameState, countdown]);
@@ -177,12 +187,16 @@ export default function WordBlastGame() {
 
     // Create unique IDs for the effects
     // Use a combination of timestamp and random number to ensure uniqueness
-    const laserId = `laser-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    const explosionId = `explosion-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const laserId = `laser-${Date.now()}-${Math.random()
+      .toString(36)
+      .substr(2, 9)}`;
+    const explosionId = `explosion-${Date.now()}-${Math.random()
+      .toString(36)
+      .substr(2, 9)}`;
 
     // Play laser sound with null check
-    window.playSound?.('laser');
-    
+    window.playSound?.("laser");
+
     // Add laser effect
     setEffects((prev) => [
       ...prev,
@@ -199,8 +213,8 @@ export default function WordBlastGame() {
     // Add explosion effect after a short delay
     setTimeout(() => {
       // Play explosion sound with null check
-      window.playSound?.('explosion');
-      
+      window.playSound?.("explosion");
+
       setEffects((prev) => [
         ...prev,
         {
@@ -258,8 +272,8 @@ export default function WordBlastGame() {
         if (newLevel > oldLevel) {
           console.log(`LEVEL UP TRIGGERED! New level: ${level + 1}`);
           // Play level up sound with null check
-          window.playSound?.('levelUp');
-          
+          window.playSound?.("levelUp");
+
           setLevel((prev) => {
             console.log(`Level changing from ${prev} to ${prev + 1}`);
             return prev + 1;
@@ -327,7 +341,7 @@ export default function WordBlastGame() {
     if (lives <= 0) {
       setGameState("gameOver");
       // Play game over sound with null check
-      window.playSound?.('gameOver');
+      window.playSound?.("gameOver");
     }
   }, [lives]);
 
@@ -340,17 +354,17 @@ export default function WordBlastGame() {
 
   // Add the toggleMute function
   const toggleMute = () => {
-    setIsMuted(prev => !prev);
+    setIsMuted((prev) => !prev);
   };
 
   return (
     <div className="game-container" ref={gameContainerRef}>
       {/* Add Sound Manager */}
       <SoundManager isMuted={isMuted} />
-      
+
       {/* Add mute button */}
-      <button 
-        className="mute-button" 
+      <button
+        className="mute-button"
         onClick={toggleMute}
         aria-label={isMuted ? "Unmute" : "Mute"}
       >
