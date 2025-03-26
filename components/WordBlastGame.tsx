@@ -273,8 +273,7 @@ export default function WordBlastGame() {
 
         // Check if this word completes the level
         if (newWordsInLevel >= maxWords && !showLevelUp) {
-          // Stop current level sounds
-          window.stopLoopingSound?.("atmosphere");
+          // Play level up sound without stopping atmosphere
           window.playSound?.("levelUp");
 
           // Show level up animation
@@ -285,7 +284,6 @@ export default function WordBlastGame() {
             setLevel((prev) => prev + 1);
             setWordsInLevel(0);
             setGameSpeed(getSpawnIntervalForLevel(level + 1));
-            window.playLoopingSound?.("atmosphere");
           }, 500); // Slight delay to ensure animation plays smoothly
         } else {
           // If level isn't complete, just increment words in level
@@ -297,6 +295,20 @@ export default function WordBlastGame() {
       }
     });
   };
+
+  // Start atmosphere sound when countdown reaches "GO!"
+  useEffect(() => {
+    if (countdown === "GO!") {
+      window.playLoopingSound?.("atmosphere");
+    }
+  }, [countdown]);
+
+  // Stop atmosphere sound when game is over
+  useEffect(() => {
+    if (gameState === "gameOver") {
+      window.stopLoopingSound?.("atmosphere");
+    }
+  }, [gameState]);
 
   // Add an effect to handle level changes
   useEffect(() => {
