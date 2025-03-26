@@ -99,11 +99,12 @@ export default function WordBlastGame() {
 
   // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCurrentInput(e.target.value);
+    const inputValue = e.target.value.toLowerCase();
+    setCurrentInput(inputValue);
 
     // Check if input matches any alien's word
     aliens.forEach((alien) => {
-      if (alien.word.toLowerCase() === e.target.value.toLowerCase()) {
+      if (alien.word.toLowerCase() === inputValue) {
         // Remove the alien and increase score
         setAliens((prev) => prev.filter((a) => a.id !== alien.id));
 
@@ -229,6 +230,7 @@ export default function WordBlastGame() {
               word={alien.word}
               x={alien.x}
               y={alien.y}
+              currentInput={currentInput}
             />
           ))}
 

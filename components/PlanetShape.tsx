@@ -6,9 +6,10 @@ interface PlanetShapeProps {
   type: PlanetType;
   size: number;
   word: string;
+  currentInput?: string;
 }
 
-export default function PlanetShape({ type, size: minSize, word }: PlanetShapeProps) {
+export default function PlanetShape({ type, size: minSize, word, currentInput = '' }: PlanetShapeProps) {
   // Calculate dynamic size based on word length
   // Longer words need bigger planets
   const baseSize = minSize;
@@ -128,6 +129,36 @@ export default function PlanetShape({ type, size: minSize, word }: PlanetShapePr
     }
   };
 
+  // Determine which letters to highlight
+  const renderHighlightedWord = () => {
+    const lowerWord = word.toLowerCase();
+    const lowerInput = currentInput.toLowerCase();
+    
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        {word.split('').map((letter, index) => {
+          // Check if this letter should be highlighted
+          const isCorrect = 
+            index < lowerInput.length && 
+            lowerWord[index] === lowerInput[index];
+          
+          return (
+            <span 
+              key={index}
+              style={{ 
+                color: isCorrect ? '#00FF00' : '#FFFFFF',
+                textShadow: '1px 1px 2px black',
+                fontWeight: 'bold',
+              }}
+            >
+              {letter}
+            </span>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
     <div className="planet-container" style={{ width: size, height: size, position: 'relative' }}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
@@ -149,14 +180,11 @@ export default function PlanetShape({ type, size: minSize, word }: PlanetShapePr
         <div 
           className="planet-word" 
           style={{ 
-            color: '#FFFFFF',
-            textShadow: '1px 1px 2px black',
-            fontWeight: 'bold',
             fontSize: `${Math.max(12, size / (word.length + 2))}px`,
             textAlign: 'center',
           }}
         >
-          {word}
+          {renderHighlightedWord()}
         </div>
       </div>
     </div>
