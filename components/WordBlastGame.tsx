@@ -38,7 +38,7 @@ export default function WordBlastGame() {
   const [lives, setLives] = useState(3);
   const [aliens, setAliens] = useState<Alien[]>([]);
   const [currentInput, setCurrentInput] = useState("");
-  const [gameSpeed, setGameSpeed] = useState(5000); // milliseconds between alien spawns
+  const [gameSpeed, setGameSpeed] = useState(2000); // milliseconds between alien spawns
   const [effects, setEffects] = useState<Effect[]>([]);
   const gameContainerRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -53,7 +53,7 @@ export default function WordBlastGame() {
     setLives(3);
     setAliens([]);
     setCurrentInput("");
-    setGameSpeed(5000);
+    setGameSpeed(2000);
     setEffects([]);
     setCountdown(3);
   };
@@ -71,6 +71,7 @@ export default function WordBlastGame() {
       } else {
         // Countdown is 0, start the actual game
         setGameState("playing");
+        generateAlien();
         if (inputRef.current) {
           inputRef.current.focus();
         }
