@@ -47,21 +47,24 @@ export default function WordBlastGame() {
 
     const currentWordList =
       wordLists[Math.min(level - 1, wordLists.length - 1)];
-    
-    // Get all words currently on screen
-    const activeWords = aliens.map(alien => alien.word);
-    
-    // Filter out words that are already on screen
-    const availableWords = currentWordList.filter(word => !activeWords.includes(word));
-    
+
+    // Get all words currently on screen (convert to lowercase for case-insensitive comparison)
+    const activeWords = aliens.map((alien) => alien.word.toLowerCase());
+
+    // Filter out words that are already on screen (case-insensitive)
+    const availableWords = currentWordList.filter(
+      (word) => !activeWords.includes(word.toLowerCase())
+    );
+
     // If all words are already on screen, wait for next cycle
     if (availableWords.length === 0) {
       console.log("All words from current list are on screen. Waiting...");
       return;
     }
-    
+
     // Select a random word from available words
-    const word = availableWords[Math.floor(Math.random() * availableWords.length)];
+    const word =
+      availableWords[Math.floor(Math.random() * availableWords.length)];
 
     // Get container width with a fallback value
     const containerWidth = gameContainerRef.current?.clientWidth || 800;
@@ -72,10 +75,10 @@ export default function WordBlastGame() {
     const charWidth = 10; // Increased from 8 to 10 for more space per character
     const wordWidth = word.length * charWidth;
     const padding = 40; // Increased from 20 to 40 for more padding
-    
+
     // Calculate the size needed to fit the word with padding
     const planetSize = Math.max(basePlanetSize, wordWidth + padding);
-    
+
     // Increase the safe margin to prevent spawning too close to the edge
     // Use the full planet size as the margin to ensure it's completely visible
     const safeMargin = planetSize;
