@@ -38,6 +38,7 @@ body {
   overflow: hidden;
 }
 
+/* Update the word-alien class to remove the need for separate word-text */
 .word-alien {
   position: absolute;
   display: flex;
@@ -46,6 +47,7 @@ body {
   transition: transform 0.2s;
 }
 
+/* You can remove the alien-sprite and word-text classes as they're no longer needed */
 .alien-sprite {
   width: 50px;
   height: 50px;
