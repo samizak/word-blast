@@ -3,7 +3,14 @@ import Player from "../Player";
 import GameInput from "./GameInput";
 import GameEffects from "./GameEffects";
 import GameStats from "./GameStats";
-import { Alien, Effect } from "../../types/game";
+
+interface Alien {
+  id: number;
+  word: string;
+  x: number;
+  y: number;
+  speed: number;
+}
 
 interface GamePlayAreaProps {
   aliens: Alien[];
@@ -11,7 +18,7 @@ interface GamePlayAreaProps {
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   inputRef: React.RefObject<HTMLInputElement | null>;
   playerRef: React.RefObject<HTMLDivElement | null>;
-  effects: Effect[];
+  effects: any[];
   level: number;
   score: number;
   lives: number;

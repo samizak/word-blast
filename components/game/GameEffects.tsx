@@ -1,6 +1,16 @@
 import Laser from "../Laser";
 import Explosion from "../Explosion";
-import { Effect } from "../../types/game";
+
+interface Effect {
+  id: string;
+  type: "laser" | "explosion";
+  startX?: number;
+  startY?: number;
+  endX?: number;
+  endY?: number;
+  x?: number;
+  y?: number;
+}
 
 interface GameEffectsProps {
   effects: Effect[];
