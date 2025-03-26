@@ -13,9 +13,9 @@ export default function PlanetShape({ type, size: minSize, word, currentInput = 
   // Calculate dynamic size based on word length
   // Longer words need bigger planets
   const baseSize = minSize;
-  const charWidth = 8; // Approximate width of each character in pixels
+  const charWidth = 10; // Increased from 8 to 10 for more space per character
   const wordWidth = word.length * charWidth;
-  const padding = 20; // Extra padding around the text
+  const padding = 40; // Increased from 20 to 40 for more padding
   
   // Calculate the size needed to fit the word with padding
   const calculatedSize = Math.max(baseSize, wordWidth + padding);
@@ -134,8 +134,19 @@ export default function PlanetShape({ type, size: minSize, word, currentInput = 
     const lowerWord = word.toLowerCase();
     const lowerInput = currentInput.toLowerCase();
     
+    // Adjust font size calculation to ensure text fits within planet
+    // Use a more aggressive scaling for longer words to keep them on one line
+    const fontSizeMultiplier = Math.min(1.5, 4 / (word.length * 0.2 + 1));
+    const fontSize = Math.max(10, Math.min(18, size / (word.length) * fontSizeMultiplier));
+    
     return (
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center',
+        flexWrap: 'nowrap', // Prevent wrapping to keep words on one line
+        maxWidth: `${size * 0.9}px`, // Increase max width to accommodate single line
+        overflow: 'hidden' // Hide overflow if needed
+      }}>
         {word.split('').map((letter, index) => {
           // Check if this letter should be highlighted
           const isCorrect = 
@@ -149,6 +160,9 @@ export default function PlanetShape({ type, size: minSize, word, currentInput = 
                 color: isCorrect ? '#00FF00' : '#FFFFFF',
                 textShadow: '1px 1px 2px black',
                 fontWeight: 'bold',
+                fontSize: `${fontSize}px`,
+                display: 'inline-block', // Keep letters inline
+                whiteSpace: 'nowrap' // Prevent wrapping
               }}
             >
               {letter}
@@ -174,14 +188,16 @@ export default function PlanetShape({ type, size: minSize, word, currentInput = 
           backgroundColor: 'rgba(40, 40, 40, 0.7)',
           borderRadius: '4px',
           padding: '2px 6px',
-          maxWidth: '90%'
+          maxWidth: `${size * 0.95}px`, // Increase to accommodate single line
+          whiteSpace: 'nowrap', // Prevent wrapping
+          overflow: 'hidden' // Hide overflow
         }}
       >
         <div 
           className="planet-word" 
           style={{ 
-            fontSize: `${Math.max(12, size / (word.length + 2))}px`,
             textAlign: 'center',
+            whiteSpace: 'nowrap' // Prevent wrapping
           }}
         >
           {renderHighlightedWord()}

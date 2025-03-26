@@ -69,15 +69,16 @@ export default function WordBlastGame() {
     // Calculate safe margins based on word length
     // Base planet size is 80, but we need to account for longer words
     const basePlanetSize = 80;
-    const charWidth = 8; // Approximate width of each character in pixels
+    const charWidth = 10; // Increased from 8 to 10 for more space per character
     const wordWidth = word.length * charWidth;
-    const padding = 20; // Extra padding around the text
+    const padding = 40; // Increased from 20 to 40 for more padding
     
     // Calculate the size needed to fit the word with padding
     const planetSize = Math.max(basePlanetSize, wordWidth + padding);
     
-    // Use the larger of the calculated planet size or a fixed margin
-    const safeMargin = Math.max(planetSize / 2, 50);
+    // Increase the safe margin to prevent spawning too close to the edge
+    // Use the full planet size as the margin to ensure it's completely visible
+    const safeMargin = planetSize;
 
     // Ensure planets spawn within safe boundaries
     const minPosition = safeMargin;
