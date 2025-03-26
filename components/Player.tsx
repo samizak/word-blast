@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef } from "react";
 import PlayerSpaceship from "./PlayerSpaceship";
 
-export default function Player() {
+const Player = forwardRef<HTMLDivElement>((props, ref) => {
   const [position, setPosition] = useState(50); // percentage from left
 
   // Handle keyboard movement
@@ -22,6 +22,7 @@ export default function Player() {
 
   return (
     <div
+      ref={ref}
       className="player"
       style={{
         left: `calc(${position}% - 100px)`, // Adjust to center the larger spaceship
@@ -36,4 +37,8 @@ export default function Player() {
       <PlayerSpaceship width={200} height={200} />
     </div>
   );
-}
+});
+
+Player.displayName = "Player";
+
+export default Player;

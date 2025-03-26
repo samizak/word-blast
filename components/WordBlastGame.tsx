@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import WordAlien from "./WordAlien";
 import Player from "./Player";
+import Laser from "./Laser";
+import Explosion from "./Explosion";
 import wordLists from "../data/wordLists";
 
 // Define types for the alien object
@@ -12,6 +14,18 @@ interface Alien {
   x: number;
   y: number;
   speed: number;
+}
+
+// Define types for visual effects
+interface Effect {
+  id: number;
+  type: "laser" | "explosion";
+  startX?: number;
+  startY?: number;
+  endX?: number;
+  endY?: number;
+  x?: number;
+  y?: number;
 }
 
 export default function WordBlastGame() {
@@ -24,8 +38,10 @@ export default function WordBlastGame() {
   const [aliens, setAliens] = useState<Alien[]>([]);
   const [currentInput, setCurrentInput] = useState("");
   const [gameSpeed, setGameSpeed] = useState(5000); // milliseconds between alien spawns
+  const [effects, setEffects] = useState<Effect[]>([]);
   const gameContainerRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const playerRef = useRef<HTMLDivElement | null>(null);
 
   // Start the game
   const startGame = () => {
@@ -36,6 +52,7 @@ export default function WordBlastGame() {
     setAliens([]);
     setCurrentInput("");
     setGameSpeed(5000);
+    setEffects([]);
     if (inputRef.current) {
       inputRef.current.focus();
     }
@@ -55,6 +72,12 @@ export default function WordBlastGame() {
     const availableWords = currentWordList.filter(
       (word) => !activeWords.includes(word.toLowerCase())
     );
+
+    // If no words are available, return early
+    if (availableWords.length === 0) {
+      console.warn("No available words to spawn.");
+      return;
+    }
 
     // If all words are already on screen, wait for next cycle
     if (availableWords.length === 0) {
@@ -101,6 +124,71 @@ export default function WordBlastGame() {
     setAliens((prev) => [...prev, newAlien]);
   };
 
+  // Create visual effects (laser and explosion)
+  const createEffects = (targetAlien: Alien) => {
+    // Get player position
+    const playerElement =
+      playerRef.current?.querySelector<HTMLDivElement>(":scope > div");
+    if (!playerElement) return;
+
+    const gameRect = gameContainerRef.current?.getBoundingClientRect();
+    const playerRect = playerElement.getBoundingClientRect();
+
+    if (!gameRect) return;
+
+    // Calculate player position relative to the game container
+    const playerX = playerRect.left - gameRect.left + playerRect.width / 2;
+    const playerY = gameRect.bottom - playerRect.height;
+
+    // Calculate target position (center of the alien)
+    if (!gameRect) return;
+
+    const targetX = targetAlien.x + gameRect.left;
+    const targetY = targetAlien.y + gameRect.top;
+
+    console.log("Player position:", playerX, playerY);
+    console.log("Target position:", targetX, targetY);
+
+    // Create unique IDs for the effects
+    const laserId = Date.now();
+    const explosionId = laserId + 1;
+
+    // Add laser effect
+    setEffects((prev) => [
+      ...prev,
+      {
+        id: laserId,
+        type: "laser",
+        startX: playerX,
+        startY: playerY,
+        endX: targetX,
+        endY: targetY,
+      },
+    ]);
+
+    // Add explosion effect after a short delay
+    setTimeout(() => {
+      setEffects((prev) => [
+        ...prev,
+        {
+          id: explosionId,
+          type: "explosion",
+          x: targetX,
+          y: targetY,
+        },
+      ]);
+    }, 200);
+
+    // Clean up effects after they're done
+    setTimeout(() => {
+      setEffects((prev) =>
+        prev.filter(
+          (effect) => effect.id !== laserId && effect.id !== explosionId
+        )
+      );
+    }, 800);
+  };
+
   // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value.toLowerCase();
@@ -109,6 +197,9 @@ export default function WordBlastGame() {
     // Check if input matches any alien's word
     aliens.forEach((alien) => {
       if (alien.word.toLowerCase() === inputValue) {
+        // Create visual effects before removing the alien
+        createEffects(alien);
+
         // Remove the alien and increase score
         setAliens((prev) => prev.filter((a) => a.id !== alien.id));
 
@@ -238,7 +329,37 @@ export default function WordBlastGame() {
             />
           ))}
 
-          <Player />
+          {/* Render visual effects */}
+          {effects.map((effect) => {
+            if (
+              effect.type === "laser" &&
+              effect.startX !== undefined &&
+              effect.startY !== undefined &&
+              effect.endX !== undefined &&
+              effect.endY !== undefined
+            ) {
+              return (
+                <Laser
+                  key={effect.id}
+                  startX={effect.startX}
+                  startY={effect.startY}
+                  endX={effect.endX}
+                  endY={effect.endY}
+                />
+              );
+            } else if (
+              effect.type === "explosion" &&
+              effect.x !== undefined &&
+              effect.y !== undefined
+            ) {
+              return <Explosion key={effect.id} x={effect.x} y={effect.y} />;
+            }
+            return null;
+          })}
+
+          <div ref={playerRef}>
+            <Player />
+          </div>
 
           <input
             ref={inputRef}
