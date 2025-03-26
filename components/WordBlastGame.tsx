@@ -8,6 +8,7 @@ import GamePlayArea from "./game/GamePlayArea";
 import GameOver from "./game/GameOver";
 import MuteButton from "./game/MuteButton";
 import wordLists from "../data/wordLists";
+import LevelUpEffect from "./game/LevelUpEffect";
 
 // Game configuration
 const GAME_CONFIG = {
@@ -61,6 +62,7 @@ export default function WordBlastGame() {
   const playerRef = useRef<HTMLDivElement | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   const canPlayCountdownSound = useRef(true);
+  const [showLevelUp, setShowLevelUp] = useState(false);
 
   // Calculate level-specific values
   const getMaxWordsForLevel = (currentLevel: number) => {
@@ -264,15 +266,30 @@ export default function WordBlastGame() {
 
         // Update score and check level completion
         setScore((prev) => prev + alien.word.length * 10);
+
+        // Calculate new words in level before checking completion
+        const newWordsInLevel = wordsInLevel + 1;
         const maxWords = getMaxWordsForLevel(level);
 
-        if (wordsInLevel >= maxWords) {
+        // Check if this word completes the level
+        if (newWordsInLevel >= maxWords && !showLevelUp) {
+          // Stop current level sounds
           window.stopLoopingSound?.("atmosphere");
           window.playSound?.("levelUp");
-          setLevel((prev) => prev + 1);
-          setWordsInLevel(0);
-          setGameSpeed(getSpawnIntervalForLevel(level + 1));
-          window.playLoopingSound?.("atmosphere");
+
+          // Show level up animation
+          setShowLevelUp(true);
+
+          // Update game state for next level
+          setTimeout(() => {
+            setLevel((prev) => prev + 1);
+            setWordsInLevel(0);
+            setGameSpeed(getSpawnIntervalForLevel(level + 1));
+            window.playLoopingSound?.("atmosphere");
+          }, 500); // Slight delay to ensure animation plays smoothly
+        } else {
+          // If level isn't complete, just increment words in level
+          setWordsInLevel(newWordsInLevel);
         }
 
         setCurrentInput("");
@@ -280,6 +297,16 @@ export default function WordBlastGame() {
       }
     });
   };
+
+  // Add an effect to handle level changes
+  useEffect(() => {
+    if (showLevelUp) {
+      const timer = setTimeout(() => {
+        setShowLevelUp(false);
+      }, 2000); // Match this with the LevelUpEffect duration
+      return () => clearTimeout(timer);
+    }
+  }, [showLevelUp]);
 
   // Update alien positions
   useEffect(() => {
@@ -366,17 +393,25 @@ export default function WordBlastGame() {
       {gameState === "countdown" && <Countdown countdown={countdown} />}
 
       {(gameState === "playing" || gameState === "countdown") && (
-        <GamePlayArea
-          aliens={aliens}
-          currentInput={currentInput}
-          onInputChange={handleInputChange}
-          inputRef={inputRef}
-          playerRef={playerRef}
-          effects={effects}
-          level={level}
-          score={score}
-          lives={lives}
-        />
+        <>
+          <GamePlayArea
+            aliens={aliens}
+            currentInput={currentInput}
+            onInputChange={handleInputChange}
+            inputRef={inputRef}
+            playerRef={playerRef}
+            effects={effects}
+            level={level}
+            score={score}
+            lives={lives}
+          />
+          {showLevelUp && (
+            <LevelUpEffect
+              level={level}
+              onComplete={() => setShowLevelUp(false)}
+            />
+          )}
+        </>
       )}
 
       {gameState === "gameOver" && (

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 interface GameStatsProps {
   level: number;
@@ -24,6 +24,23 @@ function HeartIcon({ filled }: { filled: boolean }) {
 }
 
 export default function GameStats({ level, score, lives }: GameStatsProps) {
+  const [isLevelAnimating, setIsLevelAnimating] = useState(false);
+  const [prevLevel, setPrevLevel] = useState(level);
+
+  useEffect(() => {
+    if (level !== prevLevel) {
+      setIsLevelAnimating(true);
+      setPrevLevel(level);
+
+      // Reset animation after it completes
+      const timer = setTimeout(() => {
+        setIsLevelAnimating(false);
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [level, prevLevel]);
+
   return (
     <div
       className="game-stats"
@@ -66,6 +83,7 @@ export default function GameStats({ level, score, lives }: GameStatsProps) {
             fontSize: "1.5em",
             fontWeight: "bold",
             textShadow: "0 0 10px rgba(0, 255, 170, 0.5)",
+            animation: isLevelAnimating ? "levelPop 1s ease-out" : "none",
           }}
         >
           {level}
@@ -135,6 +153,22 @@ export default function GameStats({ level, score, lives }: GameStatsProps) {
           ))}
         </div>
       </div>
+
+      <style jsx global>{`
+        @keyframes levelPop {
+          0% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.5);
+            color: #fff;
+            text-shadow: 0 0 20px rgba(0, 255, 170, 0.8);
+          }
+          100% {
+            transform: scale(1);
+          }
+        }
+      `}</style>
     </div>
   );
 }
