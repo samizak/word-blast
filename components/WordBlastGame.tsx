@@ -9,6 +9,18 @@ import GameOver from "./game/GameOver";
 import MuteButton from "./game/MuteButton";
 import wordLists from "../data/wordLists";
 
+// Game configuration
+const GAME_CONFIG = {
+  baseSpawnInterval: 2000,
+  minSpawnInterval: 600,
+  baseWordsPerLevel: 10,
+  wordsPerLevelIncrease: 5,
+  baseAlienSpeed: 0.5,
+  speedIncreasePerLevel: 0.15,
+  maxSimultaneousWords: 8,
+  pointsPerLevel: 250,
+};
+
 // Define types for the alien object
 interface Alien {
   id: number;
@@ -40,13 +52,34 @@ export default function WordBlastGame() {
   const [lives, setLives] = useState(3);
   const [aliens, setAliens] = useState<Alien[]>([]);
   const [currentInput, setCurrentInput] = useState("");
-  const [gameSpeed, setGameSpeed] = useState(2000);
+  const [gameSpeed, setGameSpeed] = useState(GAME_CONFIG.baseSpawnInterval);
   const [effects, setEffects] = useState<Effect[]>([]);
+  const [wordsInLevel, setWordsInLevel] = useState(0);
   const gameContainerRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const playerRef = useRef<HTMLDivElement | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   const canPlayCountdownSound = useRef(true);
+
+  // Calculate level-specific values
+  const getMaxWordsForLevel = (currentLevel: number) => {
+    return (
+      GAME_CONFIG.baseWordsPerLevel +
+      (currentLevel - 1) * GAME_CONFIG.wordsPerLevelIncrease
+    );
+  };
+
+  const getSpawnIntervalForLevel = (currentLevel: number) => {
+    const interval = GAME_CONFIG.baseSpawnInterval - (currentLevel - 1) * 200;
+    return Math.max(interval, GAME_CONFIG.minSpawnInterval);
+  };
+
+  const getAlienSpeedForLevel = (currentLevel: number) => {
+    return (
+      GAME_CONFIG.baseAlienSpeed +
+      (currentLevel - 1) * GAME_CONFIG.speedIncreasePerLevel
+    );
+  };
 
   // Start the game
   const startGame = () => {
@@ -57,8 +90,9 @@ export default function WordBlastGame() {
     setLives(3);
     setAliens([]);
     setCurrentInput("");
-    setGameSpeed(2000);
+    setGameSpeed(GAME_CONFIG.baseSpawnInterval);
     setEffects([]);
+    setWordsInLevel(0);
     canPlayCountdownSound.current = true;
   };
 
@@ -97,6 +131,17 @@ export default function WordBlastGame() {
   const generateAlien = () => {
     if (gameState !== "playing") return;
 
+    // Check if we've reached the maximum words for this level
+    const maxWords = getMaxWordsForLevel(level);
+    if (wordsInLevel >= maxWords) {
+      return;
+    }
+
+    // Check if we've reached the maximum simultaneous words
+    if (aliens.length >= GAME_CONFIG.maxSimultaneousWords) {
+      return;
+    }
+
     const currentWordList =
       wordLists[Math.min(level - 1, wordLists.length - 1)];
 
@@ -129,10 +174,11 @@ export default function WordBlastGame() {
       word,
       x: xPosition,
       y: 0,
-      speed: 0.5 + level * 0.1,
+      speed: getAlienSpeedForLevel(level),
     };
 
     setAliens((prev) => [...prev, newAlien]);
+    setWordsInLevel((prev) => prev + 1);
   };
 
   // Create visual effects
@@ -208,16 +254,27 @@ export default function WordBlastGame() {
         const wordPoints = alien.word.length * 10;
         const newScore = score + wordPoints;
 
-        const oldLevel = Math.floor(score / 250);
-        const newLevel = Math.floor(newScore / 250);
+        const oldLevel = Math.floor(score / GAME_CONFIG.pointsPerLevel);
+        const newLevel = Math.floor(newScore / GAME_CONFIG.pointsPerLevel);
 
         setScore(newScore);
         setCurrentInput("");
 
+        // Level up logic
         if (newLevel > oldLevel) {
           window.playSound?.("levelUp");
           setLevel((prev) => prev + 1);
-          setGameSpeed((prev) => Math.max(prev * 0.8, 1000));
+          setWordsInLevel(0); // Reset words count for new level
+          setGameSpeed(getSpawnIntervalForLevel(newLevel + 1));
+        }
+
+        // Check if level is complete
+        const maxWords = getMaxWordsForLevel(level);
+        if (wordsInLevel >= maxWords && aliens.length === 0) {
+          window.playSound?.("levelUp");
+          setLevel((prev) => prev + 1);
+          setWordsInLevel(0);
+          setGameSpeed(getSpawnIntervalForLevel(level + 1));
         }
       }
     });
@@ -259,8 +316,7 @@ export default function WordBlastGame() {
       return;
     }
 
-    const adjustedGameSpeed = Math.max(gameSpeed + level * 100, 500);
-    const spawnInterval = setInterval(generateAlien, adjustedGameSpeed);
+    const spawnInterval = setInterval(generateAlien, gameSpeed);
     return () => clearInterval(spawnInterval);
   }, [gameState, gameSpeed, level]);
 
