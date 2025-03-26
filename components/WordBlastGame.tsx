@@ -29,9 +29,10 @@ interface Effect {
 }
 
 export default function WordBlastGame() {
-  const [gameState, setGameState] = useState<"start" | "playing" | "gameOver">(
-    "start"
-  );
+  const [gameState, setGameState] = useState<
+    "start" | "countdown" | "playing" | "gameOver"
+  >("start");
+  const [countdown, setCountdown] = useState<number>(3);
   const [level, setLevel] = useState(4);
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
@@ -45,7 +46,8 @@ export default function WordBlastGame() {
 
   // Start the game
   const startGame = () => {
-    setGameState("playing");
+    setGameState("countdown");
+    setCountdown(3);
     setLevel(20);
     setScore(5000);
     setLives(3);
@@ -53,10 +55,28 @@ export default function WordBlastGame() {
     setCurrentInput("");
     setGameSpeed(5000);
     setEffects([]);
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
+    setCountdown(3);
   };
+
+  // Handle countdown
+  useEffect(() => {
+    if (gameState === "countdown") {
+      if (countdown > 0) {
+        // Decrement countdown every second
+        const timer = setTimeout(() => {
+          setCountdown((prev) => prev - 1);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+      } else {
+        // Countdown is 0, start the actual game
+        setGameState("playing");
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }
+    }
+  }, [gameState, countdown]);
 
   // Generate a new alien with a word
   const generateAlien = () => {
@@ -271,7 +291,9 @@ export default function WordBlastGame() {
 
   // Spawn new aliens
   useEffect(() => {
-    if (gameState !== "playing") return;
+    if (gameState !== "playing") {
+      return;
+    }
 
     console.log(`Level changed to: ${level}, Game speed: ${gameSpeed}ms`);
 
@@ -311,7 +333,15 @@ export default function WordBlastGame() {
         </div>
       )}
 
-      {gameState === "playing" && (
+      {gameState === "countdown" && (
+        <div className="countdown-overlay">
+          <div className="countdown-number">
+            {countdown === 0 ? "GO!" : countdown}
+          </div>
+        </div>
+      )}
+
+      {(gameState === "playing" || gameState === "countdown") && (
         <>
           <div className="game-stats">
             <div>Level: {level}</div>
@@ -361,15 +391,17 @@ export default function WordBlastGame() {
             <Player />
           </div>
 
-          <input
-            ref={inputRef}
-            type="text"
-            className="input-area"
-            value={currentInput}
-            onChange={handleInputChange}
-            placeholder="Type words here"
-            autoFocus
-          />
+          {gameState === "playing" && (
+            <input
+              ref={inputRef}
+              type="text"
+              className="input-area"
+              value={currentInput}
+              onChange={handleInputChange}
+              placeholder="Type words here"
+              autoFocus
+            />
+          )}
         </>
       )}
 
