@@ -1,52 +1,32 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import WordAlien from "./WordAlien";
-import Player from "./Player";
-import Laser from "./Laser";
-import Explosion from "./Explosion";
-import wordLists from "../data/wordLists";
 import SoundManager from "./SoundManager";
-import { Volume2, VolumeX } from "lucide-react";
-
-// Define types for the alien object
-interface Alien {
-  id: number;
-  word: string;
-  x: number;
-  y: number;
-  speed: number;
-}
-
-// Define types for visual effects
-interface Effect {
-  id: string; // Changed from number to string
-  type: "laser" | "explosion";
-  startX?: number;
-  startY?: number;
-  endX?: number;
-  endY?: number;
-  x?: number;
-  y?: number;
-}
+import StartScreen from "./game/StartScreen";
+import Countdown from "./game/Countdown";
+import GamePlayArea from "./game/GamePlayArea";
+import GameOver from "./game/GameOver";
+import MuteButton from "./game/MuteButton";
+import wordLists from "../data/wordLists";
+import { Alien, Effect, GameState } from "../types/game";
+import { useGameSound } from "../hooks/useGameSound";
 
 export default function WordBlastGame() {
-  const [gameState, setGameState] = useState<
-    "start" | "countdown" | "playing" | "gameOver"
-  >("start");
+  const [gameState, setGameState] = useState<GameState>("start");
   const [countdown, setCountdown] = useState<number>(3);
   const [level, setLevel] = useState(1);
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
   const [aliens, setAliens] = useState<Alien[]>([]);
   const [currentInput, setCurrentInput] = useState("");
-  const [gameSpeed, setGameSpeed] = useState(2000); // milliseconds between alien spawns
+  const [gameSpeed, setGameSpeed] = useState(2000);
   const [effects, setEffects] = useState<Effect[]>([]);
   const gameContainerRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const playerRef = useRef<HTMLDivElement | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   const canPlayCountdownSound = useRef(true);
+  const { playSound, playLoopingSound } = useGameSound(isMuted, gameState);
 
   // Start the game
   const startGame = () => {
@@ -67,36 +47,31 @@ export default function WordBlastGame() {
     if (gameState === "countdown") {
       if (countdown > 0) {
         if (canPlayCountdownSound.current) {
-          window.playSound?.("countdown");
+          playSound("countdown");
           canPlayCountdownSound.current = false;
         }
 
-        // Decrement countdown every second
         const timer = setTimeout(() => {
           setCountdown((prev) => prev - 1);
         }, 1000);
 
         return () => clearTimeout(timer);
       } else {
-        // Play the level up sound for "GO!" with null check
-        window.playSound?.("levelUp");
+        playSound("levelUp");
+        playLoopingSound("atmosphere");
 
-        // Start playing the atmosphere sound in a loop
-        window.playLoopingSound?.("atmosphere");
-
-        // Start the actual game after a brief delay
         const startGameTimer = setTimeout(() => {
           setGameState("playing");
           generateAlien();
           if (inputRef.current) {
             inputRef.current.focus();
           }
-        }, 800); // Give time for the "GO!" sound and animation
+        }, 800);
 
         return () => clearTimeout(startGameTimer);
       }
     }
-  }, [gameState, countdown]);
+  }, [gameState, countdown, playSound, playLoopingSound]);
 
   // Generate a new alien with a word
   const generateAlien = () => {
@@ -105,52 +80,28 @@ export default function WordBlastGame() {
     const currentWordList =
       wordLists[Math.min(level - 1, wordLists.length - 1)];
 
-    // Get all words currently on screen (convert to lowercase for case-insensitive comparison)
     const activeWords = aliens.map((alien) => alien.word.toLowerCase());
-
-    // Filter out words that are already on screen (case-insensitive)
     const availableWords = currentWordList.filter(
       (word) => !activeWords.includes(word.toLowerCase())
     );
 
-    // If no words are available, return early
     if (availableWords.length === 0) {
       console.warn("No available words to spawn.");
       return;
     }
 
-    // If all words are already on screen, wait for next cycle
-    if (availableWords.length === 0) {
-      console.log("All words from current list are on screen. Waiting...");
-      return;
-    }
-
-    // Select a random word from available words
     const word =
       availableWords[Math.floor(Math.random() * availableWords.length)];
 
-    // Get container width with a fallback value
     const containerWidth = gameContainerRef.current?.clientWidth || 800;
-
-    // Calculate safe margins based on word length
-    // Base planet size is 80, but we need to account for longer words
     const basePlanetSize = 80;
-    const charWidth = 10; // Increased from 8 to 10 for more space per character
+    const charWidth = 10;
     const wordWidth = word.length * charWidth;
-    const padding = 40; // Increased from 20 to 40 for more padding
-
-    // Calculate the size needed to fit the word with padding
+    const padding = 40;
     const planetSize = Math.max(basePlanetSize, wordWidth + padding);
-
-    // Increase the safe margin to prevent spawning too close to the edge
-    // Use the full planet size as the margin to ensure it's completely visible
     const safeMargin = planetSize;
-
-    // Ensure planets spawn within safe boundaries
     const minPosition = safeMargin;
     const maxPosition = containerWidth - safeMargin;
-
-    // Generate position within safe boundaries
     const xPosition = Math.random() * (maxPosition - minPosition) + minPosition;
 
     const newAlien: Alien = {
@@ -158,15 +109,14 @@ export default function WordBlastGame() {
       word,
       x: xPosition,
       y: 0,
-      speed: 0.5 + level * 0.1, // Increase speed with level
+      speed: 0.5 + level * 0.1,
     };
 
     setAliens((prev) => [...prev, newAlien]);
   };
 
-  // Create visual effects (laser and explosion)
+  // Create visual effects
   const createEffects = (targetAlien: Alien) => {
-    // Get player position
     const playerElement =
       playerRef.current?.querySelector<HTMLDivElement>(":scope > div");
     if (!playerElement) return;
@@ -176,21 +126,11 @@ export default function WordBlastGame() {
 
     if (!gameRect) return;
 
-    // Calculate player position relative to the game container
     const playerX = playerRect.left - gameRect.left + playerRect.width / 2;
     const playerY = gameRect.bottom - playerRect.height;
-
-    // Calculate target position (center of the alien)
-    if (!gameRect) return;
-
     const targetX = targetAlien.x + gameRect.left;
     const targetY = targetAlien.y + gameRect.top;
 
-    console.log("Player position:", playerX, playerY);
-    console.log("Target position:", targetX, targetY);
-
-    // Create unique IDs for the effects
-    // Use a combination of timestamp and random number to ensure uniqueness
     const laserId = `laser-${Date.now()}-${Math.random()
       .toString(36)
       .substr(2, 9)}`;
@@ -198,10 +138,8 @@ export default function WordBlastGame() {
       .toString(36)
       .substr(2, 9)}`;
 
-    // Play laser sound with null check
-    window.playSound?.("laser");
+    playSound("laser");
 
-    // Add laser effect
     setEffects((prev) => [
       ...prev,
       {
@@ -214,10 +152,8 @@ export default function WordBlastGame() {
       },
     ]);
 
-    // Add explosion effect after a short delay
     setTimeout(() => {
-      // Play explosion sound with null check
-      window.playSound?.("explosion");
+      playSound("explosion");
 
       setEffects((prev) => [
         ...prev,
@@ -230,7 +166,6 @@ export default function WordBlastGame() {
       ]);
     }, 200);
 
-    // Clean up effects after they're done
     setTimeout(() => {
       setEffects((prev) =>
         prev.filter(
@@ -245,50 +180,24 @@ export default function WordBlastGame() {
     const inputValue = e.target.value.toLowerCase();
     setCurrentInput(inputValue);
 
-    // Removed typing sound logic
-
-    // Check if input matches any alien's word
     aliens.forEach((alien) => {
       if (alien.word.toLowerCase() === inputValue) {
-        // Create visual effects before removing the alien
         createEffects(alien);
-
-        // Remove the alien and increase score
         setAliens((prev) => prev.filter((a) => a.id !== alien.id));
 
-        // Calculate new score
         const wordPoints = alien.word.length * 10;
         const newScore = score + wordPoints;
 
-        console.log(`Word destroyed: "${alien.word}" - Points: ${wordPoints}`);
-        console.log(`Previous score: ${score}, New score: ${newScore}`);
-
-        // Check if we're crossing a 250-point threshold
         const oldLevel = Math.floor(score / 250);
         const newLevel = Math.floor(newScore / 250);
-        console.log(`Old level calc: ${oldLevel}, New level calc: ${newLevel}`);
 
-        // Update score
         setScore(newScore);
         setCurrentInput("");
 
-        // Level up when crossing 250-point thresholds
         if (newLevel > oldLevel) {
-          console.log(`LEVEL UP TRIGGERED! New level: ${level + 1}`);
-          // Play level up sound with null check
-          window.playSound?.("levelUp");
-
-          setLevel((prev) => {
-            console.log(`Level changing from ${prev} to ${prev + 1}`);
-            return prev + 1;
-          });
-          setGameSpeed((prev) => {
-            const newSpeed = Math.max(prev * 0.8, 1000);
-            console.log(`Game speed changing from ${prev}ms to ${newSpeed}ms`);
-            return newSpeed;
-          });
-        } else {
-          console.log(`No level up: Level calc ${newLevel} not > ${oldLevel}`);
+          playSound("levelUp");
+          setLevel((prev) => prev + 1);
+          setGameSpeed((prev) => Math.max(prev * 0.8, 1000));
         }
       }
     });
@@ -305,7 +214,6 @@ export default function WordBlastGame() {
           y: alien.y + alien.speed,
         }));
 
-        // Check for aliens reaching the bottom
         const bottomAliens = updated.filter(
           (alien) =>
             alien.y > (gameContainerRef.current?.clientHeight || 600) - 100
@@ -331,11 +239,7 @@ export default function WordBlastGame() {
       return;
     }
 
-    console.log(`Level changed to: ${level}, Game speed: ${gameSpeed}ms`);
-
-    // Adjust game speed based on level
     const adjustedGameSpeed = Math.max(gameSpeed + level * 100, 500);
-
     const spawnInterval = setInterval(generateAlien, adjustedGameSpeed);
     return () => clearInterval(spawnInterval);
   }, [gameState, gameSpeed, level]);
@@ -344,10 +248,9 @@ export default function WordBlastGame() {
   useEffect(() => {
     if (lives <= 0) {
       setGameState("gameOver");
-      // Play game over sound with null check
-      window.playSound?.("gameOver");
+      playSound("gameOver");
     }
-  }, [lives]);
+  }, [lives, playSound]);
 
   // Focus input when game starts
   useEffect(() => {
@@ -356,147 +259,35 @@ export default function WordBlastGame() {
     }
   }, [gameState]);
 
-  // Update the toggleMute function
+  // Handle mute functionality
   const toggleMute = () => {
-    const newMuteState = !isMuted;
-    setIsMuted(newMuteState);
-    
-    // If we're unmuting and the game is playing, restart the atmosphere sound
-    if (!newMuteState && gameState === "playing") {
-      window.playLoopingSound?.("atmosphere");
-    }
+    setIsMuted((prev) => !prev);
   };
-  
-  // Add a new effect to handle mute state changes for looping sounds
-  useEffect(() => {
-    // When mute state changes, handle looping sounds
-    if (gameState === "playing") {
-      if (isMuted) {
-        window.stopLoopingSound?.("atmosphere");
-      } else {
-        window.playLoopingSound?.("atmosphere");
-      }
-    }
-  }, [isMuted, gameState]);
 
   return (
     <div className="game-container" ref={gameContainerRef}>
-      {/* Add Sound Manager */}
       <SoundManager isMuted={isMuted} />
+      <MuteButton isMuted={isMuted} onToggleMute={toggleMute} />
 
-      {/* Replace text emoji with SVG icons */}
-      <button
-        className="mute-button"
-        onClick={toggleMute}
-        aria-label={isMuted ? "Unmute" : "Mute"}
-      >
-        {isMuted ? (
-          <VolumeX size={32} color="#ffffff" strokeWidth={2} />
-        ) : (
-          <Volume2 size={32} color="#ffffff" strokeWidth={2} />
-        )}
-      </button>
-      
-      {gameState === "start" && (
-        <div className="flex flex-col items-center justify-center h-full">
-          <h2 className="text-3xl mb-4">Word Blast</h2>
-          <p className="mb-6 text-center max-w-md">
-            Type the words on the falling aliens to destroy them before they
-            reach the bottom!
-          </p>
-          <button
-            className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700"
-            onClick={startGame}
-          >
-            Start Game
-          </button>
-        </div>
-      )}
-
-      {gameState === "countdown" && (
-        <div className="countdown-overlay">
-          <div className="countdown-number">
-            {countdown === 0 ? "GO!" : countdown}
-          </div>
-        </div>
-      )}
+      {gameState === "start" && <StartScreen onStartGame={startGame} />}
+      {gameState === "countdown" && <Countdown countdown={countdown} />}
 
       {(gameState === "playing" || gameState === "countdown") && (
-        <>
-          <div className="game-stats">
-            <div>Level: {level}</div>
-            <div>Score: {score}</div>
-            <div>Lives: {lives}</div>
-          </div>
-
-          {aliens.map((alien) => (
-            <WordAlien
-              key={alien.id}
-              word={alien.word}
-              x={alien.x}
-              y={alien.y}
-              currentInput={currentInput}
-            />
-          ))}
-
-          {/* Render visual effects */}
-          {effects.map((effect) => {
-            if (
-              effect.type === "laser" &&
-              effect.startX !== undefined &&
-              effect.startY !== undefined &&
-              effect.endX !== undefined &&
-              effect.endY !== undefined
-            ) {
-              return (
-                <Laser
-                  key={effect.id}
-                  startX={effect.startX}
-                  startY={effect.startY}
-                  endX={effect.endX}
-                  endY={effect.endY}
-                />
-              );
-            } else if (
-              effect.type === "explosion" &&
-              effect.x !== undefined &&
-              effect.y !== undefined
-            ) {
-              return <Explosion key={effect.id} x={effect.x} y={effect.y} />;
-            }
-            return null;
-          })}
-
-          <div ref={playerRef}>
-            <Player />
-          </div>
-
-          {gameState === "playing" && (
-            <input
-              ref={inputRef}
-              type="text"
-              className="input-area"
-              value={currentInput}
-              onChange={handleInputChange}
-              placeholder="Type words here"
-              autoFocus
-            />
-          )}
-        </>
+        <GamePlayArea
+          aliens={aliens}
+          currentInput={currentInput}
+          onInputChange={handleInputChange}
+          inputRef={inputRef}
+          playerRef={playerRef}
+          effects={effects}
+          level={level}
+          score={score}
+          lives={lives}
+        />
       )}
 
       {gameState === "gameOver" && (
-        <div className="game-over">
-          <div>Game Over</div>
-          <div className="text-2xl mt-4">Level: {level}</div>
-          <div className="text-2xl mt-4">Final Score: {score}</div>
-          <button
-            className="mt-8 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700"
-            onClick={startGame}
-          >
-            Play Again
-          </button>
-        </div>
+        <GameOver level={level} score={score} onPlayAgain={startGame} />
       )}
     </div>
   );
