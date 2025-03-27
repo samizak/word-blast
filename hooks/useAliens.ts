@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { GameState } from './useGameState';
 import wordLists from '../data/wordLists';
 
@@ -33,6 +33,8 @@ export function useAliens(
 ) {
   const [aliens, setAliens] = useState<Alien[]>([]);
   const [gameSpeed, setGameSpeed] = useState(GAME_CONFIG.baseSpawnInterval);
+  const processedBottomAliensRef = useRef<Set<number>>(new Set());
+  const explodingAliensRef = useRef<Set<number>>(new Set());
 
   const getMaxWordsForLevel = useCallback((currentLevel: number) => {
     return GAME_CONFIG.baseWordsPerLevel + (currentLevel - 1) * GAME_CONFIG.wordsPerLevelIncrease;
@@ -117,19 +119,35 @@ export function useAliens(
       const bottomAliens = updated.filter(
         (alien) =>
           alien.y > (gameContainerRef.current?.clientHeight || 600) - 100 &&
-          !alien.isCompleted
+          !alien.isCompleted &&
+          !processedBottomAliensRef.current.has(alien.id)
       );
 
       if (bottomAliens.length > 0) {
+        // Mark these aliens as processed to prevent double processing
+        bottomAliens.forEach(alien => {
+          processedBottomAliensRef.current.add(alien.id);
+          markAlienAsCompleted(alien.id);
+        });
         decrementLives(bottomAliens.length);
-        return updated.filter(
-          (alien) => !bottomAliens.some(bottomAlien => bottomAlien.id === alien.id)
-        );
+
+        // Remove the aliens after explosion animation
+        setTimeout(() => {
+          setAliens(current => 
+            current.filter(alien => !bottomAliens.some(bottomAlien => bottomAlien.id === alien.id))
+          );
+        }, 1000); // Match this with the explosion animation duration
       }
 
       return updated;
     });
-  }, [decrementLives]);
+  }, [decrementLives, markAlienAsCompleted]);
+
+  // Reset processed aliens when game state changes
+  useEffect(() => {
+    processedBottomAliensRef.current.clear();
+    explodingAliensRef.current.clear();
+  }, [gameState]);
 
   // Spawn new aliens
   useEffect(() => {
