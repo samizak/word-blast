@@ -192,7 +192,10 @@ export default function WordBlastGame() {
   // Add keyboard event handler for pause
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && gameState === "playing") {
+      if (
+        e.key === "Escape" &&
+        (gameState === "playing" || gameState === "paused")
+      ) {
         togglePause();
       }
     };
