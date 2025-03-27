@@ -10,6 +10,11 @@ A fast-paced typing game where you defend Earth from alien words by typing them 
   <em>Click the image to watch the gameplay demo</em>
 </p>
 
+## 🎮 Play Now!
+
+You can play Word Blast right now in your browser:
+[**Play Word Blast**](https://word-blast-game.vercel.app/)
+
 ## ✨ Features
 
 - **Fast-paced Typing Action**: Type words to destroy alien planets before they reach Earth
