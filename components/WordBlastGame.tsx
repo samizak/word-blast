@@ -32,28 +32,6 @@ const GAME_CONFIG = {
   pointsPerLevel: 250,
 };
 
-// Define types for the alien object
-interface Alien {
-  id: number;
-  word: string;
-  x: number;
-  y: number;
-  speed: number;
-  isCompleted?: boolean;
-}
-
-// Define types for visual effects
-interface Effect {
-  id: string;
-  type: "laser" | "explosion";
-  startX?: number;
-  startY?: number;
-  endX?: number;
-  endY?: number;
-  x?: number;
-  y?: number;
-}
-
 export default function WordBlastGame() {
   const gameContainerRef = useRef<HTMLDivElement>(
     null
@@ -88,17 +66,13 @@ export default function WordBlastGame() {
 
   const { effects, setEffects, createEffects } = useEffects();
   const { isMuted, setIsMuted, toggleMute } = useSoundManager(gameState);
-  // Update the destructuring to include resetPowerUps
   const { powerUps, activePowerUps, activatePowerUp, resetPowerUps } =
     usePowerUps(gameState, gameContainerRef);
 
   // Then in handleRestartGame:
   const handleRestartGame = () => {
-    // Reset game state completely
     startGame();
-    // Make sure we're not in paused state
     setGameState("countdown");
-    // Reset any other necessary game state
     setScore(0);
     setLevel(1);
     setLives(3);
