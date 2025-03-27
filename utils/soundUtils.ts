@@ -1,4 +1,3 @@
-// Sound configuration
 export const SOUND_URLS = {
   laser: "/sounds/laser.mp3",
   explosion: "/sounds/explosion.mp3",
@@ -11,13 +10,12 @@ export const SOUND_URLS = {
 
 export type SoundType = keyof typeof SOUND_URLS;
 
-// Store active looping sounds
 const loopingSounds: { [key: string]: HTMLAudioElement } = {};
 
-/**
- * Play a one-time sound effect
- */
-export function playSound(soundType: SoundType, isMuted: boolean = false): void {
+export function playSound(
+  soundType: SoundType,
+  isMuted: boolean = false
+): void {
   if (isMuted) return;
 
   const soundUrl = SOUND_URLS[soundType];
@@ -36,13 +34,12 @@ export function playSound(soundType: SoundType, isMuted: boolean = false): void 
   }
 }
 
-/**
- * Play a looping sound (background music, etc.)
- */
-export function playLoopingSound(soundType: SoundType, isMuted: boolean = false): void {
+export function playLoopingSound(
+  soundType: SoundType,
+  isMuted: boolean = false
+): void {
   if (isMuted) return;
 
-  // Stop existing sound if it's already playing
   if (loopingSounds[soundType]) {
     loopingSounds[soundType].pause();
     loopingSounds[soundType].remove();
@@ -59,13 +56,12 @@ export function playLoopingSound(soundType: SoundType, isMuted: boolean = false)
 
     sound
       .play()
-      .catch((e) => console.error(`Error playing looping ${soundType} sound:`, e));
+      .catch((e) =>
+        console.error(`Error playing looping ${soundType} sound:`, e)
+      );
   }
 }
 
-/**
- * Stop a looping sound
- */
 export function stopLoopingSound(soundType: SoundType): void {
   if (loopingSounds[soundType]) {
     loopingSounds[soundType].pause();
@@ -74,9 +70,6 @@ export function stopLoopingSound(soundType: SoundType): void {
   }
 }
 
-/**
- * Update all looping sounds based on mute state
- */
 export function updateLoopingSounds(isMuted: boolean): void {
   Object.keys(loopingSounds).forEach((soundType) => {
     if (isMuted) {
@@ -89,17 +82,13 @@ export function updateLoopingSounds(isMuted: boolean): void {
   });
 }
 
-/**
- * Clean up all sounds (for component unmounting)
- */
 export function cleanupSounds(): void {
   Object.keys(loopingSounds).forEach((soundType) => {
     loopingSounds[soundType].pause();
     loopingSounds[soundType].remove();
   });
-  
-  // Clear the looping sounds object
-  Object.keys(loopingSounds).forEach(key => {
+
+  Object.keys(loopingSounds).forEach((key) => {
     delete loopingSounds[key];
   });
 }
