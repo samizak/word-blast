@@ -8,7 +8,6 @@ const HIGH_SCORES_KEY = "wordBlastHighScores";
 const MAX_HIGH_SCORES = 10;
 
 export const getHighScores = (): HighScore[] => {
-  // Return empty array during server-side rendering
   if (typeof window === "undefined") return [];
 
   try {

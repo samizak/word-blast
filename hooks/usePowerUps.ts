@@ -19,7 +19,6 @@ export function usePowerUps(
     const container = containerRef.current;
     const { width, height } = container.getBoundingClientRect();
 
-    // Favor slowTime power-up (70% chance for slowTime, 30% for shield)
     const randomValue = Math.random();
     const type: PowerUpType = randomValue < 0.5 ? "slowTime" : "shield";
     const config = POWER_UP_CONFIG[type];
