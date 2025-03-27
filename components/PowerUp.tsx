@@ -1,5 +1,6 @@
 import React from "react";
-import { PowerUp as PowerUpType, POWER_UP_CONFIG } from "../types/PowerUp";
+import { PowerUp as PowerUpType } from "../types/PowerUp";
+import { POWER_UP_CONFIG } from "../utils/gameConfigUtils";
 
 interface PowerUpProps {
   powerUp: PowerUpType;

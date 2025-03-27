@@ -2,17 +2,12 @@ import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { GameState } from "./useGameState";
 import wordLists from "../data/wordLists";
 import { ActivePowerUp } from "../types/PowerUp";
-
-const GAME_CONFIG = {
-  baseSpawnInterval: 2000,
-  minSpawnInterval: 600,
-  baseWordsPerLevel: 10,
-  wordsPerLevelIncrease: 5,
-  baseAlienSpeed: 0.5,
-  speedIncreasePerLevel: 0.15,
-  maxSimultaneousWords: 8,
-  pointsPerLevel: 250,
-};
+import {
+  ALIEN_CONFIG,
+  getMaxWordsForLevel,
+  getSpawnIntervalForLevel,
+  getAlienSpeedForLevel,
+} from "../utils/gameConfigUtils";
 
 export interface Alien {
   id: number;
@@ -33,28 +28,9 @@ export function useAliens(
   activePowerUps: ActivePowerUp[]
 ) {
   const [aliens, setAliens] = useState<Alien[]>([]);
-  const [gameSpeed, setGameSpeed] = useState(GAME_CONFIG.baseSpawnInterval);
+  const [gameSpeed, setGameSpeed] = useState(ALIEN_CONFIG.baseSpawnInterval);
   const processedBottomAliensRef = useRef<Set<number>>(new Set());
   const explodingAliensRef = useRef<Set<number>>(new Set());
-
-  const getMaxWordsForLevel = useCallback((currentLevel: number) => {
-    return (
-      GAME_CONFIG.baseWordsPerLevel +
-      (currentLevel - 1) * GAME_CONFIG.wordsPerLevelIncrease
-    );
-  }, []);
-
-  const getSpawnIntervalForLevel = useCallback((currentLevel: number) => {
-    const interval = GAME_CONFIG.baseSpawnInterval - (currentLevel - 1) * 200;
-    return Math.max(interval, GAME_CONFIG.minSpawnInterval);
-  }, []);
-
-  const getAlienSpeedForLevel = useCallback((currentLevel: number) => {
-    return (
-      GAME_CONFIG.baseAlienSpeed +
-      (currentLevel - 1) * GAME_CONFIG.speedIncreasePerLevel
-    );
-  }, []);
 
   const generateAlien = useCallback(() => {
     if (gameState !== "playing") return;
@@ -64,7 +40,7 @@ export function useAliens(
       return;
     }
 
-    if (aliens.length >= GAME_CONFIG.maxSimultaneousWords) {
+    if (aliens.length >= ALIEN_CONFIG.maxSimultaneousWords) {
       return;
     }
 
@@ -108,10 +84,8 @@ export function useAliens(
     level,
     wordsInLevel,
     aliens.length,
-    getMaxWordsForLevel,
-    getAlienSpeedForLevel,
-    setWordsInLevel,
     gameContainerRef,
+    setWordsInLevel,
   ]);
 
   const removeAlien = useCallback((alienId: number) => {
@@ -202,28 +176,16 @@ export function useAliens(
     return () => clearInterval(interval);
   }, [gameState, updateAlienPositions]);
 
-  const returnValue = useMemo(
-    () => ({
-      aliens,
-      setAliens,
-      gameSpeed,
-      setGameSpeed,
-      generateAlien,
-      removeAlien,
-      markAlienAsCompleted,
-      getSpawnIntervalForLevel,
-      getMaxWordsForLevel,
-    }),
-    [
-      aliens,
-      gameSpeed,
-      generateAlien,
-      removeAlien,
-      markAlienAsCompleted,
-      getSpawnIntervalForLevel,
-      getMaxWordsForLevel,
-    ]
-  );
-
-  return returnValue;
+  return {
+    aliens,
+    setAliens,
+    setGameSpeed,
+    generateAlien,
+    removeAlien,
+    markAlienAsCompleted,
+    getMaxWordsForLevel,
+    getSpawnIntervalForLevel,
+    getAlienSpeedForLevel,
+    updatePositions: updateAlienPositions,
+  };
 }
