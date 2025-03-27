@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Alien } from './useAliens';
 
 export interface Effect {
@@ -15,7 +15,7 @@ export interface Effect {
 export function useEffects() {
   const [effects, setEffects] = useState<Effect[]>([]);
 
-  const createEffects = (targetAlien: Alien, playerRef: React.RefObject<HTMLDivElement>, gameContainerRef: React.RefObject<HTMLDivElement>) => {
+  const createEffects = useCallback((targetAlien: Alien, playerRef: React.RefObject<HTMLDivElement>, gameContainerRef: React.RefObject<HTMLDivElement>) => {
     const playerElement = playerRef.current?.querySelector<HTMLDivElement>(":scope > div");
     if (!playerElement) return;
 
@@ -71,11 +71,14 @@ export function useEffects() {
         prev.filter((effect) => effect.id !== laserId && effect.id !== explosionId)
       );
     }, 800);
-  };
+  }, []);
 
-  return {
+  // Memoize the return object to prevent unnecessary re-renders
+  const returnValue = useMemo(() => ({
     effects,
     setEffects,
     createEffects,
-  };
+  }), [effects, createEffects]);
+
+  return returnValue;
 } 

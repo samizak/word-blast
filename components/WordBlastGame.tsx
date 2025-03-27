@@ -76,6 +76,8 @@ export default function WordBlastGame() {
     showLevelUp,
     setShowLevelUp,
     startGame,
+    incrementScore,
+    decrementLives,
   } = useGameState();
 
   const {
@@ -91,7 +93,7 @@ export default function WordBlastGame() {
   } = useAliens(
     gameState,
     level,
-    setLives,
+    decrementLives,
     gameContainerRef,
     setWordsInLevel,
     wordsInLevel
@@ -99,7 +101,9 @@ export default function WordBlastGame() {
 
   const { effects, setEffects, createEffects } = useEffects();
   const { isMuted, setIsMuted, toggleMute } = useSoundManager(gameState);
-  const { canPlayCountdownSound } = useCountdown(
+
+  // Use the countdown hook
+  useCountdown(
     gameState,
     countdown,
     setCountdown,
@@ -127,7 +131,7 @@ export default function WordBlastGame() {
         }, 1000);
 
         // Update score and check level completion
-        setScore((prev) => prev + alien.word.length * 10);
+        incrementScore(alien.word.length * 10);
 
         // Calculate new words in level before checking completion
         const newWordsInLevel = wordsInLevel + 1;
@@ -143,7 +147,7 @@ export default function WordBlastGame() {
 
           // Update game state for next level
           setTimeout(() => {
-            setLevel((prev) => prev + 1);
+            setLevel(level + 1);
             setWordsInLevel(0);
             setGameSpeed(getSpawnIntervalForLevel(level + 1));
           }, 500);
