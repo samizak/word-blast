@@ -51,3 +51,49 @@ npm install
 # Run the development server
 npm run dev
 ```
+
+Open http://localhost:3000 in your browser to see the game in action.
+
+## 🛠️ Technologies Used
+
+- Next.js - React framework for the application
+- TypeScript - For type-safe code
+- TailwindCSS - For styling and responsive design
+- React Hooks - For state management and side effects
+- Web Audio API - For sound effects and background music
+- CSS Animations - For visual effects and transitions
+
+## 📱 Responsive Design
+
+Word Blast is designed to work on various screen sizes:
+
+- Desktop : Optimal experience with keyboard input
+- Tablet : Playable with on-screen keyboard
+- Mobile : Adapted layout for smaller screens
+
+## 🔧 Project Structure
+
+    word-blast/
+    ├── app/          # Next.js app directory
+    ├── components/   # React components
+    │   ├── game/     # Game-specific components
+    │   └── common/   # Shared UI components
+    ├── hooks/        # Custom React hooks
+    ├── public/       # Static assets
+    │   └── sounds/   # Game sound effects
+    ├── types/        # TypeScript type definitions
+    └── utils/        # Utility functions
+
+## 🤝 Contributing
+
+Contributions are welcome! If you'd like to contribute:
+
+1. Fork the repository
+2. Create a feature branch ( git checkout -b feature/amazing-feature )
+3. Commit your changes ( git commit -m 'Add some amazing feature' )
+4. Push to the branch ( git push origin feature/amazing-feature )
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
