@@ -1,81 +1,35 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
+import { 
+  playSound, 
+  playLoopingSound, 
+  stopLoopingSound, 
+  updateLoopingSounds,
+  cleanupSounds,
+  SoundType
+} from "../utils/soundUtils";
 
 interface SoundManagerProps {
   isMuted?: boolean;
 }
 
 const SoundManager = ({ isMuted = false }: SoundManagerProps) => {
-  const soundUrls = useRef({
-    laser: "/sounds/laser.mp3",
-    explosion: "/sounds/explosion.mp3",
-    levelUp: "/sounds/levelUp.mp3",
-    gameOver: "/sounds/gameOver.mp3",
-    countdown: "/sounds/countdown.mp3",
-    go: "/sounds/go.mp3",
-    atmosphere: "/sounds/atmosphere.mp3",
-  });
-
-  const loopingSounds = useRef<{ [key: string]: HTMLAudioElement }>({});
-
   useEffect(() => {
+    // Set up global sound functions
     window.playSound = (soundType: string) => {
-      if (isMuted) return;
-
-      const soundUrl =
-        soundUrls.current[soundType as keyof typeof soundUrls.current];
-
-      if (soundUrl) {
-        const sound = new Audio(soundUrl);
-        sound.volume = 0.5;
-
-        sound
-          .play()
-          .catch((e) => console.error(`Error playing ${soundType} sound:`, e))
-          .finally(() => {
-            sound.onended = () => {
-              sound.remove();
-            };
-          });
-      }
+      playSound(soundType as SoundType, isMuted);
     };
 
     window.playLoopingSound = (soundType: string) => {
-      if (isMuted) return;
-
-      if (loopingSounds.current[soundType]) {
-        loopingSounds.current[soundType].pause();
-        loopingSounds.current[soundType].remove();
-        delete loopingSounds.current[soundType];
-      }
-
-      const soundUrl =
-        soundUrls.current[soundType as keyof typeof soundUrls.current];
-
-      if (soundUrl) {
-        const sound = new Audio(soundUrl);
-        sound.volume = 0.3;
-        sound.loop = true;
-
-        loopingSounds.current[soundType] = sound;
-
-        sound
-          .play()
-          .catch((e) =>
-            console.error(`Error playing looping ${soundType} sound:`, e)
-          );
-      }
+      playLoopingSound(soundType as SoundType, isMuted);
     };
 
     window.stopLoopingSound = (soundType: string) => {
-      if (loopingSounds.current[soundType]) {
-        loopingSounds.current[soundType].pause();
-        loopingSounds.current[soundType].remove();
-        delete loopingSounds.current[soundType];
-      }
+      stopLoopingSound(soundType as SoundType);
     };
 
+    // Clean up on unmount
     return () => {
       if ("playSound" in window) {
         window.playSound = undefined;
@@ -87,24 +41,13 @@ const SoundManager = ({ isMuted = false }: SoundManagerProps) => {
         window.stopLoopingSound = undefined;
       }
 
-      Object.keys(loopingSounds.current).forEach((soundType) => {
-        loopingSounds.current[soundType].pause();
-        loopingSounds.current[soundType].remove();
-      });
-      loopingSounds.current = {};
+      cleanupSounds();
     };
   }, [isMuted]);
 
+  // Update looping sounds when mute state changes
   useEffect(() => {
-    Object.keys(loopingSounds.current).forEach((soundType) => {
-      if (isMuted) {
-        loopingSounds.current[soundType].pause();
-      } else {
-        loopingSounds.current[soundType]
-          .play()
-          .catch((e) => console.error(`Error resuming ${soundType} sound:`, e));
-      }
-    });
+    updateLoopingSounds(isMuted);
   }, [isMuted]);
 
   return null;
