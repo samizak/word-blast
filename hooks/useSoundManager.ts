@@ -14,10 +14,10 @@ export function useSoundManager(gameState: GameState) {
     try {
       soundTransitionRef.current = true;
       if (!isMuted && !isPlayingRef.current) {
-        await window.stopLoopingSound?.("atmosphere");
+        window.stopLoopingSound?.("atmosphere");
         await new Promise((resolve) => setTimeout(resolve, 50));
         isPlayingRef.current = true;
-        await window.playLoopingSound?.("atmosphere");
+        window.playLoopingSound?.("atmosphere");
       }
     } catch (error) {
       console.warn("Error playing atmosphere sound:", error);
@@ -34,7 +34,7 @@ export function useSoundManager(gameState: GameState) {
       soundTransitionRef.current = true;
       if (isPlayingRef.current) {
         isPlayingRef.current = false;
-        await window.stopLoopingSound?.("atmosphere");
+        window.stopLoopingSound?.("atmosphere");
       }
     } catch (error) {
       console.warn("Error stopping atmosphere sound:", error);
@@ -43,9 +43,9 @@ export function useSoundManager(gameState: GameState) {
     }
   }, []);
 
-  const playGameOverSound = useCallback(async () => {
+  const playGameOverSound = useCallback(() => {
     try {
-      await window.playSound?.("gameOver");
+      window.playSound?.("gameOver");
     } catch (error) {
       console.warn("Error playing game over sound:", error);
     }

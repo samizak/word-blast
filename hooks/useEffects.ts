@@ -44,10 +44,10 @@ export function useEffects() {
 
       const laserId = `laser-${Date.now()}-${Math.random()
         .toString(36)
-        .substr(2, 9)}`;
+        .substring(2, 11)}`;
       const explosionId = `explosion-${Date.now()}-${Math.random()
         .toString(36)
-        .substr(2, 9)}`;
+        .substring(2, 11)}`;
 
       setTimeout(() => {
         window.playSound?.("laser");

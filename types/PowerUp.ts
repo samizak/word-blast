@@ -8,7 +8,7 @@ export interface PowerUp {
   y: number;
   speed: number;
   isActive: boolean;
-  duration: number; // Duration in milliseconds
+  duration: number;
 }
 
 export interface ActivePowerUp {
