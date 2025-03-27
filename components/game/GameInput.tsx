@@ -10,14 +10,18 @@ export default function GameInput({
   inputRef,
 }: GameInputProps) {
   return (
-    <input
-      ref={inputRef}
-      type="text"
-      className="input-area"
-      value={currentInput.trim()}
-      onChange={onInputChange}
-      placeholder="Type words here"
-      autoFocus
-    />
+    <div className="input-container">
+      <input
+        ref={inputRef}
+        type="text"
+        className="input-area neon-input"
+        value={currentInput.trim()}
+        onChange={onInputChange}
+        placeholder="Type words here"
+        autoFocus
+        autoComplete="off"
+        spellCheck="false"
+      />
+    </div>
   );
 }
