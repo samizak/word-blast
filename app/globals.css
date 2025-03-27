@@ -224,3 +224,37 @@ body {
   transform: scale(1.1);
   box-shadow: 0 0 10px var(--game-accent);
 }
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.animate-float {
+  animation: float 2s ease-in-out infinite;
+}
+
+/* Active power-up indicator */
+.power-up-indicator {
+  position: absolute;
+  top: 60px;
+  left: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.power-up-timer {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 15px;
+  background: rgba(0, 0, 0, 0.7);
+  font-family: "Courier New", monospace;
+}

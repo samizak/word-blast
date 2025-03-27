@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { GameState } from './useGameState';
 import wordLists from '../data/wordLists';
+import { ActivePowerUp } from '../types/PowerUp';
 
 // Game configuration
 const GAME_CONFIG = {
@@ -29,7 +30,8 @@ export function useAliens(
   decrementLives: (amount: number) => void,
   gameContainerRef: React.RefObject<HTMLDivElement>,
   setWordsInLevel: (amount: number) => void,
-  wordsInLevel: number
+  wordsInLevel: number,
+  activePowerUps: ActivePowerUp[]
 ) {
   const [aliens, setAliens] = useState<Alien[]>([]);
   const [gameSpeed, setGameSpeed] = useState(GAME_CONFIG.baseSpawnInterval);
@@ -129,7 +131,12 @@ export function useAliens(
           processedBottomAliensRef.current.add(alien.id);
           markAlienAsCompleted(alien.id);
         });
-        decrementLives(bottomAliens.length);
+
+        // Check if shield is active before decrementing lives
+        const hasShield = activePowerUps.some(p => p.type === 'shield');
+        if (!hasShield) {
+          decrementLives(bottomAliens.length);
+        }
 
         // Remove the aliens after explosion animation
         setTimeout(() => {
@@ -141,7 +148,7 @@ export function useAliens(
 
       return updated;
     });
-  }, [decrementLives, markAlienAsCompleted]);
+  }, [decrementLives, markAlienAsCompleted, activePowerUps]);
 
   // Reset processed aliens when game state changes
   useEffect(() => {
