@@ -14,31 +14,28 @@ const ShieldEffect: React.FC = () => {
         zIndex: 50,
       }}
     >
-      {/* Inner Shield Ring */}
       <div
         className="absolute inset-0 rounded-full"
         style={{
           border: "4px solid rgba(0, 255, 255, 0.8)",
           animation: "shield-pulse 2s infinite",
           boxShadow:
-            "0 0 50px rgba(0, 255, 255, 0.6), inset 0 0 50px rgba(0, 255, 255, 0.6)", // Increased glow
+            "0 0 50px rgba(0, 255, 255, 0.6), inset 0 0 50px rgba(0, 255, 255, 0.6)",
         }}
       />
-      {/* Outer Shield Ring */}
       <div
         className="absolute inset-0 rounded-full"
         style={{
           border: "3px solid rgba(0, 255, 255, 0.5)",
           animation: "shield-rotate 4s linear infinite",
-          boxShadow: "0 0 40px rgba(0, 255, 255, 0.5)", // Increased glow
+          boxShadow: "0 0 40px rgba(0, 255, 255, 0.5)",
         }}
       >
-        {/* Shield Particles */}
         <div
-          className="absolute w-5 h-5 rounded-full" // Slightly larger particles
+          className="absolute w-5 h-5 rounded-full"
           style={{
             background: "rgba(0, 255, 255, 0.8)",
-            boxShadow: "0 0 20px rgba(0, 255, 255, 0.8)", // Increased glow
+            boxShadow: "0 0 20px rgba(0, 255, 255, 0.8)",
             animation: "shield-particle 2s linear infinite",
           }}
         />

@@ -8,7 +8,6 @@ const StarBackground = () => {
     Array<{ top: string; left: string; animationDelay: string }>
   >([]);
 
-  // Generate stars on the client side only to avoid hydration mismatch
   useEffect(() => {
     const generatedStars = Array(100)
       .fill(null)

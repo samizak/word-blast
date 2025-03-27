@@ -12,7 +12,6 @@ const ClockFace: React.FC = () => {
         }}
       />
 
-      {/* Clock Markers */}
       {[...Array(12)].map((_, i) => (
         <div
           key={i}

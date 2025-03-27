@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import { GameState } from "./useGameState";
-import { Alien } from "./useAliens";
 
 export function useCountdown(
   gameState: GameState,

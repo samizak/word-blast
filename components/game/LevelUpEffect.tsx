@@ -12,7 +12,6 @@ export default function LevelUpEffect({
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
-    // Hide the effect after animation
     const timer = setTimeout(() => {
       setIsVisible(false);
       onComplete?.();
@@ -38,7 +37,6 @@ export default function LevelUpEffect({
         zIndex: 2000,
       }}
     >
-      {/* Background Flash */}
       <div
         style={{
           position: "absolute",
@@ -51,7 +49,6 @@ export default function LevelUpEffect({
         }}
       />
 
-      {/* Level Up Text */}
       <div
         style={{
           display: "flex",
@@ -82,7 +79,6 @@ export default function LevelUpEffect({
         </div>
       </div>
 
-      {/* Particle Effects */}
       <div
         className="particles"
         style={{
