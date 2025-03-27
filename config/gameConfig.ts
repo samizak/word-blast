@@ -1,9 +1,3 @@
-/**
- * Game Configuration
- * Centralized configuration values for the Word Blast game
- */
-
-// Sound settings
 export const SOUND_CONFIG = {
   delays: {
     atmosphere: 50,
@@ -12,7 +6,6 @@ export const SOUND_CONFIG = {
   },
 };
 
-// Power-up settings
 export const POWER_UP_CONFIG = {
   spawnInterval: 20000,
   moveInterval: 50,
@@ -29,7 +22,6 @@ export const POWER_UP_CONFIG = {
   },
 };
 
-// Alien settings
 export const ALIEN_CONFIG = {
   baseSpawnInterval: 2000,
   minSpawnInterval: 600,
@@ -38,7 +30,6 @@ export const ALIEN_CONFIG = {
   speedMultiplier: 1.2,
 };
 
-// Game settings
 export const GAME_CONFIG = {
   initialLives: 3,
   scoreMultiplier: 10,
