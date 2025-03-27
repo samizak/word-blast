@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { GameState } from './useGameState';
 import wordLists from '../data/wordLists';
 
@@ -26,28 +26,28 @@ export interface Alien {
 export function useAliens(
   gameState: GameState,
   level: number,
-  setLives: (cb: (prev: number) => number) => void,
+  decrementLives: (amount: number) => void,
   gameContainerRef: React.RefObject<HTMLDivElement>,
-  setWordsInLevel: (cb: (prev: number) => number) => void,
+  setWordsInLevel: (amount: number) => void,
   wordsInLevel: number
 ) {
   const [aliens, setAliens] = useState<Alien[]>([]);
   const [gameSpeed, setGameSpeed] = useState(GAME_CONFIG.baseSpawnInterval);
 
-  const getMaxWordsForLevel = (currentLevel: number) => {
+  const getMaxWordsForLevel = useCallback((currentLevel: number) => {
     return GAME_CONFIG.baseWordsPerLevel + (currentLevel - 1) * GAME_CONFIG.wordsPerLevelIncrease;
-  };
+  }, []);
 
-  const getSpawnIntervalForLevel = (currentLevel: number) => {
+  const getSpawnIntervalForLevel = useCallback((currentLevel: number) => {
     const interval = GAME_CONFIG.baseSpawnInterval - (currentLevel - 1) * 200;
     return Math.max(interval, GAME_CONFIG.minSpawnInterval);
-  };
+  }, []);
 
-  const getAlienSpeedForLevel = (currentLevel: number) => {
+  const getAlienSpeedForLevel = useCallback((currentLevel: number) => {
     return GAME_CONFIG.baseAlienSpeed + (currentLevel - 1) * GAME_CONFIG.speedIncreasePerLevel;
-  };
+  }, []);
 
-  const generateAlien = () => {
+  const generateAlien = useCallback(() => {
     if (gameState !== "playing") return;
 
     const maxWords = getMaxWordsForLevel(level);
@@ -91,8 +91,45 @@ export function useAliens(
     };
 
     setAliens((prev) => [...prev, newAlien]);
-    setWordsInLevel((prev) => prev + 1);
-  };
+    setWordsInLevel(wordsInLevel + 1);
+  }, [gameState, level, wordsInLevel, aliens.length, getMaxWordsForLevel, getAlienSpeedForLevel, setWordsInLevel]);
+
+  const removeAlien = useCallback((alienId: number) => {
+    setAliens((prev) => prev.filter((alien) => alien.id !== alienId));
+  }, []);
+
+  const markAlienAsCompleted = useCallback((alienId: number) => {
+    setAliens((prev) =>
+      prev.map((alien) =>
+        alien.id === alienId ? { ...alien, isCompleted: true } : alien
+      )
+    );
+  }, []);
+
+  // Memoize the update function for alien positions
+  const updateAlienPositions = useCallback(() => {
+    setAliens((prev) => {
+      const updated = prev.map((alien) => ({
+        ...alien,
+        y: alien.y + alien.speed,
+      }));
+
+      const bottomAliens = updated.filter(
+        (alien) =>
+          alien.y > (gameContainerRef.current?.clientHeight || 600) - 100 &&
+          !alien.isCompleted
+      );
+
+      if (bottomAliens.length > 0) {
+        decrementLives(bottomAliens.length);
+        return updated.filter(
+          (alien) => !bottomAliens.some(bottomAlien => bottomAlien.id === alien.id)
+        );
+      }
+
+      return updated;
+    });
+  }, [decrementLives]);
 
   // Spawn new aliens
   useEffect(() => {
@@ -102,52 +139,18 @@ export function useAliens(
 
     const spawnInterval = setInterval(generateAlien, gameSpeed);
     return () => clearInterval(spawnInterval);
-  }, [gameState, gameSpeed, level]);
+  }, [gameState, gameSpeed, generateAlien]);
 
   // Update alien positions
   useEffect(() => {
     if (gameState !== "playing") return;
 
-    const interval = setInterval(() => {
-      setAliens((prev) => {
-        const updated = prev.map((alien) => ({
-          ...alien,
-          y: alien.y + alien.speed,
-        }));
-
-        const bottomAliens = updated.filter(
-          (alien) =>
-            alien.y > (gameContainerRef.current?.clientHeight || 600) - 100 &&
-            !alien.isCompleted
-        );
-
-        if (bottomAliens.length > 0) {
-          setLives((prev) => prev - bottomAliens.length);
-          return updated.filter(
-            (alien) => !bottomAliens.some(bottomAlien => bottomAlien.id === alien.id)
-          );
-        }
-
-        return updated;
-      });
-    }, 50);
-
+    const interval = setInterval(updateAlienPositions, 50);
     return () => clearInterval(interval);
-  }, [gameState, setLives]);
+  }, [gameState, updateAlienPositions]);
 
-  const removeAlien = (alienId: number) => {
-    setAliens((prev) => prev.filter((alien) => alien.id !== alienId));
-  };
-
-  const markAlienAsCompleted = (alienId: number) => {
-    setAliens((prev) =>
-      prev.map((alien) =>
-        alien.id === alienId ? { ...alien, isCompleted: true } : alien
-      )
-    );
-  };
-
-  return {
+  // Memoize the return object to prevent unnecessary re-renders
+  const returnValue = useMemo(() => ({
     aliens,
     setAliens,
     gameSpeed,
@@ -157,5 +160,15 @@ export function useAliens(
     markAlienAsCompleted,
     getSpawnIntervalForLevel,
     getMaxWordsForLevel,
-  };
+  }), [
+    aliens,
+    gameSpeed,
+    generateAlien,
+    removeAlien,
+    markAlienAsCompleted,
+    getSpawnIntervalForLevel,
+    getMaxWordsForLevel,
+  ]);
+
+  return returnValue;
 } 
