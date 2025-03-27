@@ -1,8 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { GameState } from "./useGameState";
+import { useSound } from "./useSound";
 
 export function useSoundManager(gameState: GameState) {
   const [isMuted, setIsMuted] = useState(false);
+  const { playSound, playLoopingSound, stopLoopingSound } = useSound({ isMuted });
+  
   const atmosphereTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const gameOverTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const isPlayingRef = useRef(false);
@@ -14,10 +17,10 @@ export function useSoundManager(gameState: GameState) {
     try {
       soundTransitionRef.current = true;
       if (!isMuted && !isPlayingRef.current) {
-        window.stopLoopingSound?.("atmosphere");
+        stopLoopingSound("atmosphere");
         await new Promise((resolve) => setTimeout(resolve, 50));
         isPlayingRef.current = true;
-        window.playLoopingSound?.("atmosphere");
+        playLoopingSound("atmosphere");
       }
     } catch (error) {
       console.warn("Error playing atmosphere sound:", error);
@@ -25,7 +28,7 @@ export function useSoundManager(gameState: GameState) {
     } finally {
       soundTransitionRef.current = false;
     }
-  }, [isMuted]);
+  }, [isMuted, playLoopingSound, stopLoopingSound]);
 
   const stopAtmosphereSound = useCallback(async () => {
     if (soundTransitionRef.current) return;
@@ -34,22 +37,22 @@ export function useSoundManager(gameState: GameState) {
       soundTransitionRef.current = true;
       if (isPlayingRef.current) {
         isPlayingRef.current = false;
-        window.stopLoopingSound?.("atmosphere");
+        stopLoopingSound("atmosphere");
       }
     } catch (error) {
       console.warn("Error stopping atmosphere sound:", error);
     } finally {
       soundTransitionRef.current = false;
     }
-  }, []);
+  }, [stopLoopingSound]);
 
   const playGameOverSound = useCallback(() => {
     try {
-      window.playSound?.("gameOver");
+      playSound("gameOver");
     } catch (error) {
       console.warn("Error playing game over sound:", error);
     }
-  }, []);
+  }, [playSound]);
 
   const toggleMute = useCallback(() => {
     const newMuteState = !isMuted;

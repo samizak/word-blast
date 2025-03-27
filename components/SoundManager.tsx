@@ -1,27 +1,25 @@
 "use client";
 
 import { useEffect } from "react";
-import {
-  playSound,
-  playLoopingSound,
-  stopLoopingSound,
-  updateLoopingSounds,
-  cleanupSounds,
-  SoundType,
-} from "../utils/soundUtils";
+import { useSound } from "../hooks/useSound";
+import { SoundType } from "../utils/soundUtils";
 
 interface SoundManagerProps {
   isMuted?: boolean;
 }
 
 const SoundManager = ({ isMuted = false }: SoundManagerProps) => {
+  const { playSound, playLoopingSound, stopLoopingSound } = useSound({
+    isMuted,
+  });
+
   useEffect(() => {
     window.playSound = (soundType: string) => {
-      playSound(soundType as SoundType, isMuted);
+      playSound(soundType as SoundType);
     };
 
     window.playLoopingSound = (soundType: string) => {
-      playLoopingSound(soundType as SoundType, isMuted);
+      playLoopingSound(soundType as SoundType);
     };
 
     window.stopLoopingSound = (soundType: string) => {
@@ -38,14 +36,8 @@ const SoundManager = ({ isMuted = false }: SoundManagerProps) => {
       if ("stopLoopingSound" in window) {
         window.stopLoopingSound = undefined;
       }
-
-      cleanupSounds();
     };
-  }, [isMuted]);
-
-  useEffect(() => {
-    updateLoopingSounds(isMuted);
-  }, [isMuted]);
+  }, [playSound, playLoopingSound, stopLoopingSound]);
 
   return null;
 };
