@@ -63,14 +63,6 @@ Open http://localhost:3000 in your browser to see the game in action.
 - Web Audio API - For sound effects and background music
 - CSS Animations - For visual effects and transitions
 
-## 📱 Responsive Design
-
-Word Blast is designed to work on various screen sizes:
-
-- Desktop : Optimal experience with keyboard input
-- Tablet : Playable with on-screen keyboard
-- Mobile : Adapted layout for smaller screens
-
 ## 🔧 Project Structure
 
     word-blast/
