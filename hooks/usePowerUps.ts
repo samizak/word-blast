@@ -1,10 +1,6 @@
 import { useState, useEffect, useCallback, RefObject } from "react";
-import {
-  PowerUp,
-  PowerUpType,
-  ActivePowerUp,
-  POWER_UP_CONFIG,
-} from "../types/PowerUp";
+import { PowerUp, PowerUpType, ActivePowerUp } from "../types/PowerUp";
+import { POWER_UP_CONFIG } from "../config/gameConfig";
 
 export function usePowerUps(
   gameState: string,
@@ -21,7 +17,7 @@ export function usePowerUps(
 
     const randomValue = Math.random();
     const type: PowerUpType = randomValue < 0.5 ? "slowTime" : "shield";
-    const config = POWER_UP_CONFIG[type];
+    const config = POWER_UP_CONFIG.types[type];
 
     const powerUp: PowerUp = {
       id: Date.now(),
@@ -90,7 +86,7 @@ export function usePowerUps(
 
     const spawnInterval = setInterval(() => {
       generatePowerUp();
-    }, 20000); // Changed to 20 seconds
+    }, POWER_UP_CONFIG.spawnInterval);
 
     return () => clearInterval(spawnInterval);
   }, [gameState, generatePowerUp]);

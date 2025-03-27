@@ -1,13 +1,12 @@
 "use client";
 
 import WordBlastGame from "../components/WordBlastGame";
-import StarBackground from "../components/StarBackground";
+import GameLayout from "../components/layout/GameLayout";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center">
-      <StarBackground />
+    <GameLayout>
       <WordBlastGame />
-    </main>
+    </GameLayout>
   );
 }
