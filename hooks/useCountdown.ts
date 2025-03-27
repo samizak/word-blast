@@ -1,5 +1,6 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 import { GameState } from './useGameState';
+import { Alien } from './useAliens';
 
 export function useCountdown(
   gameState: GameState,
@@ -10,71 +11,42 @@ export function useCountdown(
   inputRef: React.RefObject<HTMLInputElement>
 ) {
   const canPlayCountdownSound = useRef(true);
-  const soundTimerRef = useRef<NodeJS.Timeout | undefined>(undefined);
-  const countdownTimerRef = useRef<NodeJS.Timeout | undefined>(undefined);
-  const gameStartTimerRef = useRef<NodeJS.Timeout | undefined>(undefined);
-
-  const handleCountdownComplete = useCallback(() => {
-    window.playSound?.("levelUp");
-    gameStartTimerRef.current = setTimeout(() => {
-      window.playLoopingSound?.("atmosphere");
-      setGameState("playing");
-      generateAlien();
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
-    }, 200);
-  }, [setGameState, generateAlien]);
 
   useEffect(() => {
-    if (gameState === "countdown") {
-      if (countdown > 0) {
-        soundTimerRef.current = setTimeout(() => {
-          if (canPlayCountdownSound.current) {
-            window.playSound?.("countdown");
-            canPlayCountdownSound.current = false;
-          }
-        }, 100);
-
-        countdownTimerRef.current = setTimeout(() => {
-          setCountdown(countdown - 1);
-        }, 1000);
-
-        return () => {
-          if (soundTimerRef.current) {
-            clearTimeout(soundTimerRef.current);
-          }
-          if (countdownTimerRef.current) {
-            clearTimeout(countdownTimerRef.current);
-          }
-        };
-      } else {
-        const timer = setTimeout(handleCountdownComplete, 800);
-        return () => {
-          if (timer) {
-            clearTimeout(timer);
-          }
-        };
-      }
+    if (gameState !== 'countdown') {
+      canPlayCountdownSound.current = true;
+      return;
     }
-  }, [gameState, countdown, setCountdown, handleCountdownComplete]);
 
-  // Cleanup on unmount
-  useEffect(() => {
+    // Play sound immediately when countdown starts
+    if (canPlayCountdownSound.current) {
+      window.playSound?.('countdown');
+      canPlayCountdownSound.current = false;
+    }
+
+    const interval = setInterval(() => {
+      if (countdown <= 1) {
+        clearInterval(interval);
+        setGameState('playing');
+        generateAlien();
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+        setCountdown(0);
+        return;
+      }
+
+      // Play countdown sound for each number
+      if (canPlayCountdownSound.current) {
+        window.playSound?.('countdown');
+        canPlayCountdownSound.current = false;
+      }
+
+      setCountdown(countdown - 1);
+    }, 1000);
+
     return () => {
-      if (soundTimerRef.current) {
-        clearTimeout(soundTimerRef.current);
-      }
-      if (countdownTimerRef.current) {
-        clearTimeout(countdownTimerRef.current);
-      }
-      if (gameStartTimerRef.current) {
-        clearTimeout(gameStartTimerRef.current);
-      }
+      clearInterval(interval);
     };
-  }, []);
-
-  return {
-    canPlayCountdownSound,
-  };
+  }, [gameState, countdown, setCountdown, setGameState, generateAlien]);
 } 
