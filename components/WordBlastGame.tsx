@@ -13,6 +13,8 @@ import { useAliens } from "../hooks/useAliens";
 import { useEffects } from "../hooks/useEffects";
 import { useSoundManager } from "../hooks/useSoundManager";
 import { useCountdown } from "../hooks/useCountdown";
+import PauseButton from "./game/PauseButton";
+import PauseMenu from "./game/PauseMenu";
 
 // Game configuration
 const GAME_CONFIG = {
@@ -78,6 +80,7 @@ export default function WordBlastGame() {
     startGame,
     incrementScore,
     decrementLives,
+    togglePause,
   } = useGameState();
 
   const {
@@ -186,10 +189,30 @@ export default function WordBlastGame() {
     }
   }, [showLevelUp]);
 
+  // Add keyboard event handler for pause
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && gameState === "playing") {
+        togglePause();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [gameState, togglePause]);
+
   return (
     <div className="game-container" ref={gameContainerRef}>
       <SoundManager isMuted={isMuted} />
-      <MuteButton isMuted={isMuted} onToggleMute={toggleMute} />
+      <div className="flex absolute top-4 right-4 z-50 gap-4">
+        <MuteButton isMuted={isMuted} onToggleMute={toggleMute} />
+        {(gameState === "playing" || gameState === "paused") && (
+          <PauseButton
+            isPaused={gameState === "paused"}
+            onTogglePause={togglePause}
+          />
+        )}
+      </div>
 
       {gameState === "start" && <StartScreen onStartGame={startGame} />}
       {gameState === "countdown" && <Countdown countdown={countdown} />}
@@ -214,6 +237,14 @@ export default function WordBlastGame() {
             />
           )}
         </>
+      )}
+
+      {gameState === "paused" && (
+        <PauseMenu
+          onResume={togglePause}
+          onRestart={startGame}
+          onQuit={() => setGameState("start")}
+        />
       )}
 
       {gameState === "gameOver" && (

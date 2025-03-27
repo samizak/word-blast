@@ -1,6 +1,6 @@
 import { useReducer, useCallback } from 'react';
 
-export type GameState = "start" | "countdown" | "playing" | "gameOver";
+export type GameState = "start" | "countdown" | "playing" | "gameOver" | "paused";
 
 type GameStateAction =
   | { type: 'START_GAME' }
@@ -12,7 +12,8 @@ type GameStateAction =
   | { type: 'SET_WORDS_IN_LEVEL'; payload: number }
   | { type: 'SET_SHOW_LEVEL_UP'; payload: boolean }
   | { type: 'INCREMENT_SCORE'; payload: number }
-  | { type: 'DECREMENT_LIVES'; payload: number };
+  | { type: 'DECREMENT_LIVES'; payload: number }
+  | { type: 'TOGGLE_PAUSE' };
 
 interface GameStateData {
   gameState: GameState;
@@ -59,6 +60,11 @@ function gameStateReducer(state: GameStateData, action: GameStateAction): GameSt
       return { ...state, score: state.score + action.payload };
     case 'DECREMENT_LIVES':
       return { ...state, lives: state.lives - action.payload };
+    case 'TOGGLE_PAUSE':
+      return {
+        ...state,
+        gameState: state.gameState === "playing" ? "paused" : "playing"
+      };
     default:
       return state;
   }
@@ -107,6 +113,10 @@ export function useGameState() {
     dispatch({ type: 'DECREMENT_LIVES', payload: amount });
   }, []);
 
+  const togglePause = useCallback(() => {
+    dispatch({ type: 'TOGGLE_PAUSE' });
+  }, []);
+
   return {
     ...state,
     startGame,
@@ -119,5 +129,6 @@ export function useGameState() {
     setShowLevelUp,
     incrementScore,
     decrementLives,
+    togglePause,
   };
 } 
