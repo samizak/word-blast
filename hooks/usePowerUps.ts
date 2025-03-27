@@ -1,10 +1,6 @@
 import { useState, useEffect, useCallback, RefObject } from "react";
-import {
-  PowerUp,
-  PowerUpType,
-  ActivePowerUp,
-  POWER_UP_CONFIG,
-} from "../types/PowerUp";
+import { PowerUp, PowerUpType, ActivePowerUp } from "../types/PowerUp";
+import { POWER_UP_CONFIG } from "../utils/gameConfigUtils";
 
 export function usePowerUps(
   gameState: string,
