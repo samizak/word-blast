@@ -217,7 +217,7 @@ export default function WordBlastGame() {
         (p: ActivePowerUp) => p.type === "slowTime"
       );
       if (hasSlowTime) {
-        matchingAlien.speed *= 0.5; // Slow the alien down
+        matchingAlien.speed *= 0.1; // Slow the alien down to 10% (90% reduction)
       }
 
       setCurrentInput("");
