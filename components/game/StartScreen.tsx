@@ -99,7 +99,7 @@ export default function StartScreen({ onStartGame }: StartScreenProps) {
       {/* Start Button */}
       <button
         onClick={onStartGame}
-        className="text-2xl px-8 py-4 relative"
+        className="text-2xl px-8 py-4 relative cursor-pointer"
         style={{
           fontFamily: "Courier New, monospace",
           background: "rgba(0, 255, 0, 0.2)",
