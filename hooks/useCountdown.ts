@@ -27,12 +27,18 @@ export function useCountdown(
     const interval = setInterval(() => {
       if (countdown <= 1) {
         clearInterval(interval);
-        setGameState('playing');
-        generateAlien();
-        if (inputRef.current) {
-          inputRef.current.focus();
-        }
+        // Set countdown to 0 first to show "GO!"
         setCountdown(0);
+        
+        // Delay the transition to playing state to allow "GO!" to be visible
+        setTimeout(() => {
+          setGameState('playing');
+          generateAlien();
+          if (inputRef.current) {
+            inputRef.current.focus();
+          }
+        }, 1000); // Show "GO!" for 1 second
+        
         return;
       }
 
@@ -49,4 +55,4 @@ export function useCountdown(
       clearInterval(interval);
     };
   }, [gameState, countdown, setCountdown, setGameState, generateAlien]);
-} 
+}
