@@ -19,10 +19,10 @@ const PowerUpEffects: React.FC<PowerUpEffectsProps> = ({
           style={{
             position: "fixed",
             left: "50%",
-            bottom: "40px",
-            width: "240px",
-            height: "180px",
-            marginLeft: "-120px",
+            bottom: "80px",
+            width: "180px",
+            height: "140px",
+            marginLeft: "-90px",
             zIndex: 50,
           }}
         >
@@ -30,27 +30,27 @@ const PowerUpEffects: React.FC<PowerUpEffectsProps> = ({
           <div
             className="absolute inset-0 rounded-full"
             style={{
-              border: "5px solid rgba(0, 255, 255, 0.8)",
+              border: "4px solid rgba(0, 255, 255, 0.8)",
               animation: "shield-pulse 2s infinite",
               boxShadow:
-                "0 0 50px rgba(0, 255, 255, 0.6), inset 0 0 50px rgba(0, 255, 255, 0.6)",
+                "0 0 40px rgba(0, 255, 255, 0.6), inset 0 0 40px rgba(0, 255, 255, 0.6)",
             }}
           />
           {/* Outer Shield Ring */}
           <div
             className="absolute inset-0 rounded-full"
             style={{
-              border: "4px solid rgba(0, 255, 255, 0.5)",
+              border: "3px solid rgba(0, 255, 255, 0.5)",
               animation: "shield-rotate 4s linear infinite",
-              boxShadow: "0 0 40px rgba(0, 255, 255, 0.5)",
+              boxShadow: "0 0 30px rgba(0, 255, 255, 0.5)",
             }}
           >
             {/* Shield Particles */}
             <div
-              className="absolute w-5 h-5 rounded-full"
+              className="absolute w-4 h-4 rounded-full"
               style={{
                 background: "rgba(0, 255, 255, 0.8)",
-                boxShadow: "0 0 20px rgba(0, 255, 255, 0.8)",
+                boxShadow: "0 0 15px rgba(0, 255, 255, 0.8)",
                 animation: "shield-particle 2s linear infinite",
               }}
             />
