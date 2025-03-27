@@ -1,4 +1,4 @@
-export type PowerUpType = 'shield' | 'slowTime';
+export type PowerUpType = "shield" | "slowTime";
 
 export interface PowerUp {
   id: number;
@@ -20,15 +20,15 @@ export interface ActivePowerUp {
 export const POWER_UP_CONFIG = {
   shield: {
     duration: 10000, // 10 seconds
-    word: 'SHIELD',
-    color: '#00ffff', // Cyan
+    word: "SHIELD",
+    color: "#00ffff", // Cyan
     probability: 0.1, // 10% chance to spawn
   },
   slowTime: {
     duration: 8000, // 8 seconds
-    word: 'SLOW',
-    color: '#9933ff', // Purple
+    word: "SLOW",
+    color: "#9933ff", // Purple
     probability: 0.1,
     slowFactor: 0.5, // Reduces speed by 50%
   },
-} 
+};
