@@ -17,7 +17,6 @@ const PowerUp: React.FC<PowerUpProps> = ({ powerUp }) => {
         transition: "top 0.05s linear",
       }}
     >
-      {/* Power-up icon */}
       <div
         className="w-12 h-12 rounded-full mb-2 flex items-center justify-center"
         style={{
@@ -37,7 +36,6 @@ const PowerUp: React.FC<PowerUpProps> = ({ powerUp }) => {
         </span>
       </div>
 
-      {/* Power-up word */}
       <span
         className="text-xl font-bold tracking-wider"
         style={{

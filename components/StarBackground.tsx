@@ -4,8 +4,10 @@ import React, { useState, useEffect, useId } from "react";
 
 const StarBackground = () => {
   const id = useId();
-  const [stars, setStars] = useState<Array<{top: string, left: string, animationDelay: string}>>([]);
-  
+  const [stars, setStars] = useState<
+    Array<{ top: string; left: string; animationDelay: string }>
+  >([]);
+
   // Generate stars on the client side only to avoid hydration mismatch
   useEffect(() => {
     const generatedStars = Array(100)
@@ -15,7 +17,7 @@ const StarBackground = () => {
         left: `${Math.random() * 100}vw`,
         animationDelay: `${Math.random() * 10}s`,
       }));
-    
+
     setStars(generatedStars);
   }, []);
 

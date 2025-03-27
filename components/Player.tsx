@@ -4,9 +4,8 @@ import { useState, useEffect, forwardRef } from "react";
 import PlayerSpaceship from "./PlayerSpaceship";
 
 const Player = forwardRef<HTMLDivElement>((props, ref) => {
-  const [position, setPosition] = useState(50); // percentage from left
+  const [position, setPosition] = useState(50);
 
-  // Handle keyboard movement
   useEffect(() => {
     const handleKeyDown = (e: { key: string }) => {
       if (e.key === "ArrowLeft") {
@@ -25,13 +24,13 @@ const Player = forwardRef<HTMLDivElement>((props, ref) => {
       ref={ref}
       className="player"
       style={{
-        left: `calc(${position}% - 100px)`, // Adjust to center the larger spaceship
+        left: `calc(${position}% - 100px)`,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        background: "transparent", // Remove the background color
-        width: "200px", // Match the spaceship width
-        height: "200px" // Match the spaceship height
+        background: "transparent",
+        width: "200px",
+        height: "200px",
       }}
     >
       <PlayerSpaceship width={200} height={200} />

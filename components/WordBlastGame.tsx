@@ -57,7 +57,6 @@ export default function WordBlastGame() {
   const { powerUps, activePowerUps, activatePowerUp, resetPowerUps } =
     usePowerUps(gameState, gameContainerRef);
 
-  // Then in handleRestartGame:
   const handleRestartGame = () => {
     startGame();
     setGameState("countdown");
@@ -67,17 +66,13 @@ export default function WordBlastGame() {
     setWordsInLevel(0);
     setShowLevelUp(false);
 
-    // Clear any active effects or aliens
     setAliens([]);
     setEffects([]);
 
-    // Reset power-ups
     resetPowerUps();
 
-    // Reset input
     setCurrentInput("");
 
-    // Focus the input field
     if (inputRef.current) {
       inputRef.current.focus();
     }
@@ -102,7 +97,6 @@ export default function WordBlastGame() {
     activePowerUps
   );
 
-  // Use the countdown hook
   useCountdown(
     gameState,
     countdown,
@@ -112,12 +106,10 @@ export default function WordBlastGame() {
     inputRef
   );
 
-  // Handle input changes with power-up support
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value.toLowerCase();
     setCurrentInput(inputValue);
 
-    // Check for power-up words
     const matchingPowerUp = powerUps.find(
       (powerUp: PowerUpType) => powerUp.word.toLowerCase() === inputValue
     );
@@ -130,55 +122,43 @@ export default function WordBlastGame() {
       return;
     }
 
-    // Check for alien words
     const matchingAlien = aliens.find(
       (alien) => alien.word.toLowerCase() === inputValue
     );
 
     if (matchingAlien) {
-      // Create laser and explosion effects
       createEffects(matchingAlien, playerRef, gameContainerRef);
 
-      // Mark the alien as completed and trigger explosion
       markAlienAsCompleted(matchingAlien.id);
 
-      // Remove the alien after explosion animation
       setTimeout(() => {
         removeAlien(matchingAlien.id);
       }, 1000);
 
-      // Update score and check level completion
       incrementScore(matchingAlien.word.length * 10);
 
-      // Calculate new words in level before checking completion
       const newWordsInLevel = wordsInLevel + 1;
       const maxWords = getMaxWordsForLevel(level);
 
-      // Check if this word completes the level
       if (newWordsInLevel >= maxWords && !showLevelUp) {
-        // Play level up sound without stopping atmosphere
         window.playSound?.("levelUp");
 
-        // Show level up animation
         setShowLevelUp(true);
 
-        // Update game state for next level
         setTimeout(() => {
           setLevel(level + 1);
           setWordsInLevel(0);
           setGameSpeed(getSpawnIntervalForLevel(level + 1));
         }, 500);
       } else {
-        // If level isn't complete, just increment words in level
         setWordsInLevel(newWordsInLevel);
       }
 
-      // Apply slow time effect to alien speed
       const hasSlowTime = activePowerUps.some(
         (p: ActivePowerUp) => p.type === "slowTime"
       );
       if (hasSlowTime) {
-        matchingAlien.speed *= 0.1; // Slow the alien down to 10% (90% reduction)
+        matchingAlien.speed *= 0.1;
       }
 
       setCurrentInput("");
@@ -191,21 +171,18 @@ export default function WordBlastGame() {
     setScore(score + 10);
   };
 
-  // Check for game over
   useEffect(() => {
     if (lives <= 0) {
       setGameState("gameOver");
     }
   }, [lives, setGameState]);
 
-  // Focus input when game starts
   useEffect(() => {
     if (gameState === "playing" && inputRef.current) {
       inputRef.current.focus();
     }
   }, [gameState]);
 
-  // Add an effect to handle level changes
   useEffect(() => {
     if (showLevelUp) {
       const timer = setTimeout(() => {
@@ -215,7 +192,6 @@ export default function WordBlastGame() {
     }
   }, [showLevelUp, setShowLevelUp]);
 
-  // Add keyboard event handler for pause
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (

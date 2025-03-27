@@ -16,19 +16,18 @@ export interface ActivePowerUp {
   endTime: number;
 }
 
-// Power-up configuration
 export const POWER_UP_CONFIG = {
   shield: {
-    duration: 10000, // 10 seconds
+    duration: 10000,
     word: "SHIELD",
-    color: "#00ffff", // Cyan
-    probability: 0.1, // 10% chance to spawn
+    color: "#00ffff",
+    probability: 0.1,
   },
   slowTime: {
-    duration: 8000, // 8 seconds
+    duration: 8000,
     word: "SLOW",
-    color: "#9933ff", // Purple
+    color: "#9933ff",
     probability: 0.1,
-    slowFactor: 0.1, // Reduces speed to 10% (90% reduction)
+    slowFactor: 0.1,
   },
 };
