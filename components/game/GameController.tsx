@@ -8,6 +8,17 @@ import { useSoundManager } from "../../hooks/useSoundManager";
 import { usePowerUps } from "../../hooks/usePowerUps";
 import { ActivePowerUp } from "../../types/PowerUp";
 
+interface Effect {
+  id: string;
+  type: "laser" | "explosion";
+  startX?: number;
+  startY?: number;
+  endX?: number;
+  endY?: number;
+  x?: number;
+  y?: number;
+}
+
 interface GameContextType {
   gameState: GameState;
   setGameState: (state: GameState) => void;
@@ -18,7 +29,7 @@ interface GameContextType {
   toggleMute: () => void;
   startGame: () => void;
   aliens: Alien[];
-  effects: any[];
+  effects: Effect[];
   currentInput: string;
   setCurrentInput: (input: string) => void;
   activePowerUps: ActivePowerUp[];
