@@ -7,7 +7,6 @@ interface SoundManagerProps {
 }
 
 const SoundManager = ({ isMuted = false }: SoundManagerProps) => {
-  // Add sound URLs
   const soundUrls = useRef({
     laser: "/sounds/laser.mp3",
     explosion: "/sounds/explosion.mp3",
@@ -15,33 +14,26 @@ const SoundManager = ({ isMuted = false }: SoundManagerProps) => {
     gameOver: "/sounds/gameOver.mp3",
     countdown: "/sounds/countdown.mp3",
     go: "/sounds/go.mp3",
-    atmosphere: "/sounds/atmosphere.mp3", // Add atmosphere sound
+    atmosphere: "/sounds/atmosphere.mp3",
   });
 
-  // Keep track of looping sounds
   const loopingSounds = useRef<{ [key: string]: HTMLAudioElement }>({});
 
-  // Effect for handling sound functions
   useEffect(() => {
-    // Expose sound functions globally
     window.playSound = (soundType: string) => {
       if (isMuted) return;
 
-      // Get the URL for the requested sound
       const soundUrl =
         soundUrls.current[soundType as keyof typeof soundUrls.current];
 
       if (soundUrl) {
-        // Create a new Audio instance each time
         const sound = new Audio(soundUrl);
         sound.volume = 0.5;
 
-        // Play the sound and handle cleanup
         sound
           .play()
           .catch((e) => console.error(`Error playing ${soundType} sound:`, e))
           .finally(() => {
-            // Clean up the audio element after it's done playing
             sound.onended = () => {
               sound.remove();
             };
@@ -49,31 +41,25 @@ const SoundManager = ({ isMuted = false }: SoundManagerProps) => {
       }
     };
 
-    // Add a function to play looping sounds
     window.playLoopingSound = (soundType: string) => {
       if (isMuted) return;
 
-      // Stop existing looping sound of this type if it exists
       if (loopingSounds.current[soundType]) {
         loopingSounds.current[soundType].pause();
         loopingSounds.current[soundType].remove();
         delete loopingSounds.current[soundType];
       }
 
-      // Get the URL for the requested sound
       const soundUrl =
         soundUrls.current[soundType as keyof typeof soundUrls.current];
 
       if (soundUrl) {
-        // Create a new Audio instance
         const sound = new Audio(soundUrl);
-        sound.volume = 0.3; // Lower volume for background sounds
-        sound.loop = true; // Enable looping
+        sound.volume = 0.3;
+        sound.loop = true;
 
-        // Store the sound for later reference
         loopingSounds.current[soundType] = sound;
 
-        // Play the sound
         sound
           .play()
           .catch((e) =>
@@ -82,7 +68,6 @@ const SoundManager = ({ isMuted = false }: SoundManagerProps) => {
       }
     };
 
-    // Add a function to stop looping sounds
     window.stopLoopingSound = (soundType: string) => {
       if (loopingSounds.current[soundType]) {
         loopingSounds.current[soundType].pause();
@@ -91,7 +76,6 @@ const SoundManager = ({ isMuted = false }: SoundManagerProps) => {
       }
     };
 
-    // Cleanup
     return () => {
       if ("playSound" in window) {
         window.playSound = undefined;
@@ -103,7 +87,6 @@ const SoundManager = ({ isMuted = false }: SoundManagerProps) => {
         window.stopLoopingSound = undefined;
       }
 
-      // Stop and clean up all looping sounds
       Object.keys(loopingSounds.current).forEach((soundType) => {
         loopingSounds.current[soundType].pause();
         loopingSounds.current[soundType].remove();
@@ -112,9 +95,7 @@ const SoundManager = ({ isMuted = false }: SoundManagerProps) => {
     };
   }, [isMuted]);
 
-  // Separate effect for handling mute state changes
   useEffect(() => {
-    // Update all looping sounds when mute state changes
     Object.keys(loopingSounds.current).forEach((soundType) => {
       if (isMuted) {
         loopingSounds.current[soundType].pause();
@@ -126,10 +107,9 @@ const SoundManager = ({ isMuted = false }: SoundManagerProps) => {
     });
   }, [isMuted]);
 
-  return null; // This component doesn't render anything
+  return null;
 };
 
-// Add type definition for the global window object
 declare global {
   interface Window {
     playSound?: (soundType: string) => void;
