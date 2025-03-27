@@ -1,19 +1,24 @@
-import { useReducer, useCallback } from 'react';
+import { useReducer, useCallback } from "react";
 
-export type GameState = "start" | "countdown" | "playing" | "gameOver" | "paused";
+export type GameState =
+  | "start"
+  | "countdown"
+  | "playing"
+  | "gameOver"
+  | "paused";
 
 type GameStateAction =
-  | { type: 'START_GAME' }
-  | { type: 'SET_GAME_STATE'; payload: GameState }
-  | { type: 'SET_COUNTDOWN'; payload: number }
-  | { type: 'SET_LEVEL'; payload: number }
-  | { type: 'SET_SCORE'; payload: number }
-  | { type: 'SET_LIVES'; payload: number }
-  | { type: 'SET_WORDS_IN_LEVEL'; payload: number }
-  | { type: 'SET_SHOW_LEVEL_UP'; payload: boolean }
-  | { type: 'INCREMENT_SCORE'; payload: number }
-  | { type: 'DECREMENT_LIVES'; payload: number }
-  | { type: 'TOGGLE_PAUSE' };
+  | { type: "START_GAME" }
+  | { type: "SET_GAME_STATE"; payload: GameState }
+  | { type: "SET_COUNTDOWN"; payload: number }
+  | { type: "SET_LEVEL"; payload: number }
+  | { type: "SET_SCORE"; payload: number }
+  | { type: "SET_LIVES"; payload: number }
+  | { type: "SET_WORDS_IN_LEVEL"; payload: number }
+  | { type: "SET_SHOW_LEVEL_UP"; payload: boolean }
+  | { type: "INCREMENT_SCORE"; payload: number }
+  | { type: "DECREMENT_LIVES"; payload: number }
+  | { type: "TOGGLE_PAUSE" };
 
 interface GameStateData {
   gameState: GameState;
@@ -35,35 +40,38 @@ const initialState: GameStateData = {
   showLevelUp: false,
 };
 
-function gameStateReducer(state: GameStateData, action: GameStateAction): GameStateData {
+function gameStateReducer(
+  state: GameStateData,
+  action: GameStateAction
+): GameStateData {
   switch (action.type) {
-    case 'START_GAME':
+    case "START_GAME":
       return {
         ...initialState,
         gameState: "countdown",
       };
-    case 'SET_GAME_STATE':
+    case "SET_GAME_STATE":
       return { ...state, gameState: action.payload };
-    case 'SET_COUNTDOWN':
+    case "SET_COUNTDOWN":
       return { ...state, countdown: action.payload };
-    case 'SET_LEVEL':
+    case "SET_LEVEL":
       return { ...state, level: action.payload };
-    case 'SET_SCORE':
+    case "SET_SCORE":
       return { ...state, score: action.payload };
-    case 'SET_LIVES':
+    case "SET_LIVES":
       return { ...state, lives: action.payload };
-    case 'SET_WORDS_IN_LEVEL':
+    case "SET_WORDS_IN_LEVEL":
       return { ...state, wordsInLevel: action.payload };
-    case 'SET_SHOW_LEVEL_UP':
+    case "SET_SHOW_LEVEL_UP":
       return { ...state, showLevelUp: action.payload };
-    case 'INCREMENT_SCORE':
+    case "INCREMENT_SCORE":
       return { ...state, score: state.score + action.payload };
-    case 'DECREMENT_LIVES':
+    case "DECREMENT_LIVES":
       return { ...state, lives: state.lives - action.payload };
-    case 'TOGGLE_PAUSE':
+    case "TOGGLE_PAUSE":
       return {
         ...state,
-        gameState: state.gameState === "playing" ? "paused" : "playing"
+        gameState: state.gameState === "playing" ? "paused" : "playing",
       };
     default:
       return state;
@@ -74,47 +82,47 @@ export function useGameState() {
   const [state, dispatch] = useReducer(gameStateReducer, initialState);
 
   const startGame = useCallback(() => {
-    dispatch({ type: 'START_GAME' });
+    dispatch({ type: "START_GAME" });
   }, []);
 
   const setGameState = useCallback((newState: GameState) => {
-    dispatch({ type: 'SET_GAME_STATE', payload: newState });
+    dispatch({ type: "SET_GAME_STATE", payload: newState });
   }, []);
 
   const setCountdown = useCallback((countdown: number) => {
-    dispatch({ type: 'SET_COUNTDOWN', payload: countdown });
+    dispatch({ type: "SET_COUNTDOWN", payload: countdown });
   }, []);
 
   const setLevel = useCallback((level: number) => {
-    dispatch({ type: 'SET_LEVEL', payload: level });
+    dispatch({ type: "SET_LEVEL", payload: level });
   }, []);
 
   const setScore = useCallback((score: number) => {
-    dispatch({ type: 'SET_SCORE', payload: score });
+    dispatch({ type: "SET_SCORE", payload: score });
   }, []);
 
   const setLives = useCallback((lives: number) => {
-    dispatch({ type: 'SET_LIVES', payload: lives });
+    dispatch({ type: "SET_LIVES", payload: lives });
   }, []);
 
   const setWordsInLevel = useCallback((wordsInLevel: number) => {
-    dispatch({ type: 'SET_WORDS_IN_LEVEL', payload: wordsInLevel });
+    dispatch({ type: "SET_WORDS_IN_LEVEL", payload: wordsInLevel });
   }, []);
 
   const setShowLevelUp = useCallback((showLevelUp: boolean) => {
-    dispatch({ type: 'SET_SHOW_LEVEL_UP', payload: showLevelUp });
+    dispatch({ type: "SET_SHOW_LEVEL_UP", payload: showLevelUp });
   }, []);
 
   const incrementScore = useCallback((amount: number) => {
-    dispatch({ type: 'INCREMENT_SCORE', payload: amount });
+    dispatch({ type: "INCREMENT_SCORE", payload: amount });
   }, []);
 
   const decrementLives = useCallback((amount: number) => {
-    dispatch({ type: 'DECREMENT_LIVES', payload: amount });
+    dispatch({ type: "DECREMENT_LIVES", payload: amount });
   }, []);
 
   const togglePause = useCallback(() => {
-    dispatch({ type: 'TOGGLE_PAUSE' });
+    dispatch({ type: "TOGGLE_PAUSE" });
   }, []);
 
   return {
@@ -131,4 +139,4 @@ export function useGameState() {
     decrementLives,
     togglePause,
   };
-} 
+}

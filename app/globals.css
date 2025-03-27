@@ -570,10 +570,11 @@ body {
   border: 2px solid #00ff9d;
   color: #00ff9d;
   text-shadow: 0 0 5px rgba(0, 255, 157, 0.7);
-  box-shadow: 0 0 10px rgba(0, 255, 157, 0.5), inset 0 0 5px rgba(0, 255, 157, 0.2);
+  box-shadow: 0 0 10px rgba(0, 255, 157, 0.5),
+    inset 0 0 5px rgba(0, 255, 157, 0.2);
   border-radius: 4px;
   padding: 8px 12px;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   font-size: 18px;
   letter-spacing: 1px;
   transition: all 0.3s ease;
@@ -587,5 +588,6 @@ body {
 .neon-input:focus {
   outline: none;
   border-color: #ff3c9e;
-  box-shadow: 0 0 15px rgba(255, 60, 158, 0.7), inset 0 0 5px rgba(255, 60, 158, 0.3);
+  box-shadow: 0 0 15px rgba(255, 60, 158, 0.7),
+    inset 0 0 5px rgba(255, 60, 158, 0.3);
 }

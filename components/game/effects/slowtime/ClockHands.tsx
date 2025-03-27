@@ -3,7 +3,6 @@ import React from "react";
 const ClockHands: React.FC = () => {
   return (
     <>
-      {/* Reverse-spinning Hour Hand */}
       <div
         className="absolute w-1.5 h-40"
         style={{
@@ -16,7 +15,6 @@ const ClockHands: React.FC = () => {
         }}
       />
 
-      {/* Forward-spinning Minute Hand */}
       <div
         className="absolute w-1 h-48"
         style={{
@@ -29,7 +27,6 @@ const ClockHands: React.FC = () => {
         }}
       />
 
-      {/* Center Dot */}
       <div
         className="absolute w-4 h-4 rounded-full"
         style={{

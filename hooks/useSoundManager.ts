@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { GameState } from './useGameState';
+import { useState, useEffect, useCallback, useRef } from "react";
+import { GameState } from "./useGameState";
 
 export function useSoundManager(gameState: GameState) {
   const [isMuted, setIsMuted] = useState(false);
@@ -10,17 +10,17 @@ export function useSoundManager(gameState: GameState) {
 
   const playAtmosphereSound = useCallback(async () => {
     if (soundTransitionRef.current) return;
-    
+
     try {
       soundTransitionRef.current = true;
       if (!isMuted && !isPlayingRef.current) {
         await window.stopLoopingSound?.("atmosphere");
-        await new Promise(resolve => setTimeout(resolve, 50)); // Small delay to ensure clean state
+        await new Promise((resolve) => setTimeout(resolve, 50));
         isPlayingRef.current = true;
         await window.playLoopingSound?.("atmosphere");
       }
     } catch (error) {
-      console.warn('Error playing atmosphere sound:', error);
+      console.warn("Error playing atmosphere sound:", error);
       isPlayingRef.current = false;
     } finally {
       soundTransitionRef.current = false;
@@ -29,7 +29,7 @@ export function useSoundManager(gameState: GameState) {
 
   const stopAtmosphereSound = useCallback(async () => {
     if (soundTransitionRef.current) return;
-    
+
     try {
       soundTransitionRef.current = true;
       if (isPlayingRef.current) {
@@ -37,7 +37,7 @@ export function useSoundManager(gameState: GameState) {
         await window.stopLoopingSound?.("atmosphere");
       }
     } catch (error) {
-      console.warn('Error stopping atmosphere sound:', error);
+      console.warn("Error stopping atmosphere sound:", error);
     } finally {
       soundTransitionRef.current = false;
     }
@@ -47,7 +47,7 @@ export function useSoundManager(gameState: GameState) {
     try {
       await window.playSound?.("gameOver");
     } catch (error) {
-      console.warn('Error playing game over sound:', error);
+      console.warn("Error playing game over sound:", error);
     }
   }, []);
 
@@ -56,7 +56,6 @@ export function useSoundManager(gameState: GameState) {
     setIsMuted(newMuteState);
 
     if (!newMuteState && gameState === "playing") {
-      // Add a small delay before playing to ensure clean state
       setTimeout(() => {
         playAtmosphereSound();
       }, 50);
@@ -65,7 +64,6 @@ export function useSoundManager(gameState: GameState) {
     }
   }, [isMuted, gameState, playAtmosphereSound, stopAtmosphereSound]);
 
-  // Handle atmosphere sound based on game state and mute status
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
 
@@ -73,7 +71,6 @@ export function useSoundManager(gameState: GameState) {
       if (isMuted) {
         stopAtmosphereSound();
       } else {
-        // Add a small delay before playing to ensure clean state
         timeoutId = setTimeout(() => {
           playAtmosphereSound();
         }, 50);
@@ -89,7 +86,6 @@ export function useSoundManager(gameState: GameState) {
     };
   }, [isMuted, gameState, playAtmosphereSound, stopAtmosphereSound]);
 
-  // Handle game over sound
   useEffect(() => {
     if (gameState === "gameOver") {
       stopAtmosphereSound();
@@ -105,7 +101,6 @@ export function useSoundManager(gameState: GameState) {
     };
   }, [gameState, stopAtmosphereSound, playGameOverSound]);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       stopAtmosphereSound();
@@ -123,4 +118,4 @@ export function useSoundManager(gameState: GameState) {
     setIsMuted,
     toggleMute,
   };
-} 
+}

@@ -13,7 +13,6 @@ const TimeClock: React.FC = () => {
     >
       <PulsatingWaves />
 
-      {/* Clock Face */}
       <div
         className="absolute inset-0"
         style={{
@@ -23,7 +22,6 @@ const TimeClock: React.FC = () => {
         }}
       />
 
-      {/* Reverse-spinning Hour Hand */}
       <div
         className="absolute w-1.5 h-40"
         style={{
@@ -36,7 +34,6 @@ const TimeClock: React.FC = () => {
         }}
       />
 
-      {/* Forward-spinning Minute Hand */}
       <div
         className="absolute w-1 h-48"
         style={{
@@ -49,7 +46,6 @@ const TimeClock: React.FC = () => {
         }}
       />
 
-      {/* Center Dot */}
       <div
         className="absolute w-4 h-4 rounded-full"
         style={{

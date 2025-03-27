@@ -1,9 +1,8 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { GameState } from './useGameState';
-import wordLists from '../data/wordLists';
-import { ActivePowerUp } from '../types/PowerUp';
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { GameState } from "./useGameState";
+import wordLists from "../data/wordLists";
+import { ActivePowerUp } from "../types/PowerUp";
 
-// Game configuration
 const GAME_CONFIG = {
   baseSpawnInterval: 2000,
   minSpawnInterval: 600,
@@ -39,7 +38,10 @@ export function useAliens(
   const explodingAliensRef = useRef<Set<number>>(new Set());
 
   const getMaxWordsForLevel = useCallback((currentLevel: number) => {
-    return GAME_CONFIG.baseWordsPerLevel + (currentLevel - 1) * GAME_CONFIG.wordsPerLevelIncrease;
+    return (
+      GAME_CONFIG.baseWordsPerLevel +
+      (currentLevel - 1) * GAME_CONFIG.wordsPerLevelIncrease
+    );
   }, []);
 
   const getSpawnIntervalForLevel = useCallback((currentLevel: number) => {
@@ -48,7 +50,10 @@ export function useAliens(
   }, []);
 
   const getAlienSpeedForLevel = useCallback((currentLevel: number) => {
-    return GAME_CONFIG.baseAlienSpeed + (currentLevel - 1) * GAME_CONFIG.speedIncreasePerLevel;
+    return (
+      GAME_CONFIG.baseAlienSpeed +
+      (currentLevel - 1) * GAME_CONFIG.speedIncreasePerLevel
+    );
   }, []);
 
   const generateAlien = useCallback(() => {
@@ -63,7 +68,8 @@ export function useAliens(
       return;
     }
 
-    const currentWordList = wordLists[Math.min(level - 1, wordLists.length - 1)];
+    const currentWordList =
+      wordLists[Math.min(level - 1, wordLists.length - 1)];
     const activeWords = aliens.map((alien) => alien.word.toLowerCase());
     const availableWords = currentWordList.filter(
       (word) => !activeWords.includes(word.toLowerCase())
@@ -74,7 +80,8 @@ export function useAliens(
       return;
     }
 
-    const word = availableWords[Math.floor(Math.random() * availableWords.length)];
+    const word =
+      availableWords[Math.floor(Math.random() * availableWords.length)];
     const containerWidth = gameContainerRef.current?.clientWidth || 800;
     const basePlanetSize = 80;
     const charWidth = 10;
@@ -96,7 +103,16 @@ export function useAliens(
 
     setAliens((prev) => [...prev, newAlien]);
     setWordsInLevel(wordsInLevel + 1);
-  }, [gameState, level, wordsInLevel, aliens.length, getMaxWordsForLevel, getAlienSpeedForLevel, setWordsInLevel, gameContainerRef]);
+  }, [
+    gameState,
+    level,
+    wordsInLevel,
+    aliens.length,
+    getMaxWordsForLevel,
+    getAlienSpeedForLevel,
+    setWordsInLevel,
+    gameContainerRef,
+  ]);
 
   const removeAlien = useCallback((alienId: number) => {
     setAliens((prev) => prev.filter((alien) => alien.id !== alienId));
@@ -110,65 +126,66 @@ export function useAliens(
     );
   }, []);
 
-  // Memoize the update function for alien positions
   const updateAlienPositions = useCallback(() => {
     if (gameState !== "playing") return;
-  
+
     setAliens((prevAliens) => {
       const updatedAliens = prevAliens.map((alien: Alien) => {
-        // Check if slow time is active
-        const hasSlowTime = activePowerUps.some(
-          (p) => p.type === "slowTime"
-        );
-        
-        // Apply slow factor if power-up is active
+        const hasSlowTime = activePowerUps.some((p) => p.type === "slowTime");
+
         const speedMultiplier = hasSlowTime ? 0.1 : 1;
-        
+
         return {
           ...alien,
           y: alien.y + alien.speed * speedMultiplier,
         };
       });
-  
+
       const bottomAliens = updatedAliens.filter(
         (alien: Alien) =>
           alien.y > (gameContainerRef.current?.clientHeight || 600) - 100 &&
           !alien.isCompleted &&
           !processedBottomAliensRef.current.has(alien.id)
       );
-    
+
       if (bottomAliens.length > 0) {
-        // Mark these aliens as processed to prevent double processing
         bottomAliens.forEach((alien: Alien) => {
           processedBottomAliensRef.current.add(alien.id);
           markAlienAsCompleted(alien.id);
         });
-    
-        // Check if shield is active before decrementing lives
-        const hasShield = activePowerUps.some(p => p.type === 'shield');
+
+        const hasShield = activePowerUps.some((p) => p.type === "shield");
         if (!hasShield) {
           decrementLives(bottomAliens.length);
         }
-    
-        // Remove the aliens after explosion animation
+
         setTimeout(() => {
-          setAliens(current => 
-            current.filter(alien => !bottomAliens.some((bottomAlien: Alien) => bottomAlien.id === alien.id))
+          setAliens((current) =>
+            current.filter(
+              (alien) =>
+                !bottomAliens.some(
+                  (bottomAlien: Alien) => bottomAlien.id === alien.id
+                )
+            )
           );
-        }, 1000); // Match this with the explosion animation duration
+        }, 1000);
       }
-    
+
       return updatedAliens;
     });
-  }, [gameState, activePowerUps, gameContainerRef, markAlienAsCompleted, decrementLives]);
+  }, [
+    gameState,
+    activePowerUps,
+    gameContainerRef,
+    markAlienAsCompleted,
+    decrementLives,
+  ]);
 
-  // Reset processed aliens when game state changes
   useEffect(() => {
     processedBottomAliensRef.current.clear();
     explodingAliensRef.current.clear();
   }, [gameState]);
 
-  // Spawn new aliens
   useEffect(() => {
     if (gameState !== "playing") {
       return;
@@ -178,7 +195,6 @@ export function useAliens(
     return () => clearInterval(spawnInterval);
   }, [gameState, gameSpeed, generateAlien]);
 
-  // Update alien positions
   useEffect(() => {
     if (gameState !== "playing") return;
 
@@ -186,26 +202,28 @@ export function useAliens(
     return () => clearInterval(interval);
   }, [gameState, updateAlienPositions]);
 
-  // Memoize the return object to prevent unnecessary re-renders
-  const returnValue = useMemo(() => ({
-    aliens,
-    setAliens,
-    gameSpeed,
-    setGameSpeed,
-    generateAlien,
-    removeAlien,
-    markAlienAsCompleted,
-    getSpawnIntervalForLevel,
-    getMaxWordsForLevel,
-  }), [
-    aliens,
-    gameSpeed,
-    generateAlien,
-    removeAlien,
-    markAlienAsCompleted,
-    getSpawnIntervalForLevel,
-    getMaxWordsForLevel,
-  ]);
+  const returnValue = useMemo(
+    () => ({
+      aliens,
+      setAliens,
+      gameSpeed,
+      setGameSpeed,
+      generateAlien,
+      removeAlien,
+      markAlienAsCompleted,
+      getSpawnIntervalForLevel,
+      getMaxWordsForLevel,
+    }),
+    [
+      aliens,
+      gameSpeed,
+      generateAlien,
+      removeAlien,
+      markAlienAsCompleted,
+      getSpawnIntervalForLevel,
+      getMaxWordsForLevel,
+    ]
+  );
 
   return returnValue;
 }

@@ -21,7 +21,6 @@ export default function Laser({
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    // Animate the laser firing
     const startTime = Date.now();
     const animate = () => {
       const elapsed = Date.now() - startTime;
@@ -35,7 +34,6 @@ export default function Laser({
 
     requestAnimationFrame(animate);
 
-    // Hide the laser after duration
     const timer = setTimeout(() => {
       setVisible(false);
     }, duration);
@@ -47,21 +45,18 @@ export default function Laser({
 
   if (!visible) return null;
 
-  // Calculate the angle and length for laser orientation
   const angle = Math.atan2(endY - startY, endX - startX) * (180 / Math.PI);
   const length = Math.sqrt(
     Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2)
   );
   const animatedLength = length * progress;
 
-  // Define gradient colors for layered effect
   const coreColor = color;
   const glowColor = color.replace(")", ", 0.5)").replace("rgb", "rgba");
   const trailColor = color.replace(")", ", 0.2)").replace("rgb", "rgba");
 
   return (
     <>
-      {/* Trail effect */}
       <div
         style={{
           position: "absolute",
@@ -79,7 +74,6 @@ export default function Laser({
         }}
       />
 
-      {/* Main beam - outer glow */}
       <div
         style={{
           position: "absolute",
@@ -96,7 +90,6 @@ export default function Laser({
         }}
       />
 
-      {/* Core beam */}
       <div
         style={{
           position: "absolute",
@@ -112,7 +105,6 @@ export default function Laser({
         }}
       />
 
-      {/* Impact point glow */}
       <div
         style={{
           position: "absolute",

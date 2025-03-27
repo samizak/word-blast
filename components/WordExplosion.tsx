@@ -27,28 +27,25 @@ export default function WordExplosion({
   const [particles, setParticles] = useState<Particle[]>([]);
 
   useEffect(() => {
-    // Create initial particles
-    const numParticles = Math.min(word.length * 8, 40); // More particles for bigger words
-    const colors = ["#ff0000", "#ff4400", "#ff8800", "#ffcc00", "#ff6600"]; // Red and orange colors
+    const numParticles = Math.min(word.length * 8, 40);
+    const colors = ["#ff0000", "#ff4400", "#ff8800", "#ffcc00", "#ff6600"];
     const newParticles: Particle[] = [];
 
-    // Letter particles
     word.split("").forEach((letter, index) => {
       const angle = (index / word.length) * Math.PI * 2;
-      const speed = 3 + Math.random() * 4; // Faster initial speed
+      const speed = 3 + Math.random() * 4;
       newParticles.push({
         x: x,
         y: y,
         vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed - 3, // Stronger upward boost
-        size: 24 + Math.random() * 12, // Bigger particles
+        vy: Math.sin(angle) * speed - 3,
+        size: 24 + Math.random() * 12,
         color: colors[Math.floor(Math.random() * colors.length)],
         alpha: 1,
         rotation: Math.random() * 360,
       });
     });
 
-    // Additional spark particles
     for (let i = 0; i < numParticles; i++) {
       const angle = (i / numParticles) * Math.PI * 2 + Math.random() * 0.5;
       const speed = 2 + Math.random() * 5;
@@ -66,7 +63,6 @@ export default function WordExplosion({
 
     setParticles(newParticles);
 
-    // Animation loop
     let animationFrame: number;
     const startTime = Date.now();
 
@@ -85,9 +81,9 @@ export default function WordExplosion({
             ...particle,
             x: particle.x + particle.vx,
             y: particle.y + particle.vy,
-            vy: particle.vy + 0.15, // Stronger gravity
-            alpha: particle.alpha * 0.97, // Slower fade
-            rotation: particle.rotation + particle.vx * 3, // Faster rotation
+            vy: particle.vy + 0.15,
+            alpha: particle.alpha * 0.97,
+            rotation: particle.rotation + particle.vx * 3,
           }))
           .filter((particle) => particle.alpha > 0.1)
       );

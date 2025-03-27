@@ -11,9 +11,7 @@ const DigitalRain: React.FC = () => {
             left: `${Math.random() * 100}%`,
             top: "100%",
             opacity: 0.6,
-            animation: `digital-rain ${
-              2 + Math.random() * 2
-            }s linear infinite`,
+            animation: `digital-rain ${2 + Math.random() * 2}s linear infinite`,
             animationDelay: `${Math.random() * 2}s`,
           }}
         >
