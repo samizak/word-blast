@@ -88,10 +88,38 @@ export default function WordBlastGame() {
 
   const { effects, setEffects, createEffects } = useEffects();
   const { isMuted, setIsMuted, toggleMute } = useSoundManager(gameState);
-  const { powerUps, activePowerUps, activatePowerUp } = usePowerUps(
-    gameState,
-    gameContainerRef
-  );
+  // Update the destructuring to include resetPowerUps
+  const { powerUps, activePowerUps, activatePowerUp, resetPowerUps } =
+    usePowerUps(gameState, gameContainerRef);
+
+  // Then in handleRestartGame:
+  const handleRestartGame = () => {
+    // Reset game state completely
+    startGame();
+    // Make sure we're not in paused state
+    setGameState("countdown");
+    // Reset any other necessary game state
+    setScore(0);
+    setLevel(1);
+    setLives(3);
+    setWordsInLevel(0);
+    setShowLevelUp(false);
+
+    // Clear any active effects or aliens
+    setAliens([]);
+    setEffects([]);
+
+    // Reset power-ups
+    resetPowerUps();
+
+    // Reset input
+    setCurrentInput("");
+
+    // Focus the input field
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
 
   const {
     aliens,
@@ -289,13 +317,13 @@ export default function WordBlastGame() {
       {gameState === "paused" && (
         <PauseMenu
           onResume={togglePause}
-          onRestart={startGame}
+          onRestart={handleRestartGame}
           onQuit={() => setGameState("start")}
         />
       )}
 
       {gameState === "gameOver" && (
-        <GameOver level={level} score={score} onPlayAgain={startGame} />
+        <GameOver level={level} score={score} onPlayAgain={handleRestartGame} />
       )}
     </div>
   );
