@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, RefObject } from 'react';
 import { PowerUp, PowerUpType, ActivePowerUp, POWER_UP_CONFIG } from '../types/PowerUp';
 
+// Add a reset function to the hook
 export function usePowerUps(gameState: string, containerRef: RefObject<HTMLDivElement>) {
   const [powerUps, setPowerUps] = useState<PowerUp[]>([]);
   const [activePowerUps, setActivePowerUps] = useState<ActivePowerUp[]>([]);
@@ -100,9 +101,12 @@ export function usePowerUps(gameState: string, containerRef: RefObject<HTMLDivEl
     return () => clearInterval(moveInterval);
   }, [gameState, updatePowerUps]);
 
-  return {
-    powerUps,
-    activePowerUps,
-    activatePowerUp,
-  };
-} 
+  // Add a reset function
+  const resetPowerUps = useCallback(() => {
+    setPowerUps([]);
+    setActivePowerUps([]);
+  }, []);
+  
+  // Return the reset function
+  return { powerUps, activePowerUps, activatePowerUp, resetPowerUps };
+}
