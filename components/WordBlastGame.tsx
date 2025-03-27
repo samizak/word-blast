@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, RefObject } from "react";
 import SoundManager from "./SoundManager";
 import StartScreen from "./game/StartScreen";
 import Countdown from "./game/Countdown";
@@ -15,6 +15,10 @@ import { useSoundManager } from "../hooks/useSoundManager";
 import { useCountdown } from "../hooks/useCountdown";
 import PauseButton from "./game/PauseButton";
 import PauseMenu from "./game/PauseMenu";
+import PowerUp from "./PowerUp";
+import ActivePowerUps from "./game/ActivePowerUps";
+import { usePowerUps } from "../hooks/usePowerUps";
+import { PowerUp as PowerUpType, ActivePowerUp } from "../types/PowerUp";
 
 // Game configuration
 const GAME_CONFIG = {
@@ -53,13 +57,11 @@ interface Effect {
 export default function WordBlastGame() {
   const gameContainerRef = useRef<HTMLDivElement>(
     null
-  ) as React.RefObject<HTMLDivElement>;
+  ) as RefObject<HTMLDivElement>;
   const inputRef = useRef<HTMLInputElement>(
     null
-  ) as React.RefObject<HTMLInputElement>;
-  const playerRef = useRef<HTMLDivElement>(
-    null
-  ) as React.RefObject<HTMLDivElement>;
+  ) as RefObject<HTMLInputElement>;
+  const playerRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
   const [currentInput, setCurrentInput] = useState("");
 
   const {
@@ -83,6 +85,13 @@ export default function WordBlastGame() {
     togglePause,
   } = useGameState();
 
+  const { effects, setEffects, createEffects } = useEffects();
+  const { isMuted, setIsMuted, toggleMute } = useSoundManager(gameState);
+  const { powerUps, activePowerUps, activatePowerUp } = usePowerUps(
+    gameState,
+    gameContainerRef
+  );
+
   const {
     aliens,
     setAliens,
@@ -99,11 +108,9 @@ export default function WordBlastGame() {
     decrementLives,
     gameContainerRef,
     setWordsInLevel,
-    wordsInLevel
+    wordsInLevel,
+    activePowerUps
   );
-
-  const { effects, setEffects, createEffects } = useEffects();
-  const { isMuted, setIsMuted, toggleMute } = useSoundManager(gameState);
 
   // Use the countdown hook
   useCountdown(
@@ -115,54 +122,78 @@ export default function WordBlastGame() {
     inputRef
   );
 
-  // Handle input changes
+  // Handle input changes with power-up support
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value.toLowerCase();
     setCurrentInput(inputValue);
 
-    aliens.forEach((alien) => {
-      if (alien.word.toLowerCase() === inputValue) {
-        // Create laser and explosion effects
-        createEffects(alien, playerRef, gameContainerRef);
+    // Check for power-up words
+    const matchingPowerUp = powerUps.find(
+      (powerUp: PowerUpType) => powerUp.word.toLowerCase() === inputValue
+    );
 
-        // Mark the alien as completed and trigger explosion
-        markAlienAsCompleted(alien.id);
+    if (matchingPowerUp) {
+      activatePowerUp(matchingPowerUp);
+      setCurrentInput("");
+      e.target.value = "";
+      window.playSound?.("powerUp");
+      return;
+    }
 
-        // Remove the alien after explosion animation
+    // Check for alien words
+    const matchingAlien = aliens.find(
+      (alien) => alien.word.toLowerCase() === inputValue
+    );
+
+    if (matchingAlien) {
+      // Create laser and explosion effects
+      createEffects(matchingAlien, playerRef, gameContainerRef);
+
+      // Mark the alien as completed and trigger explosion
+      markAlienAsCompleted(matchingAlien.id);
+
+      // Remove the alien after explosion animation
+      setTimeout(() => {
+        removeAlien(matchingAlien.id);
+      }, 1000);
+
+      // Update score and check level completion
+      incrementScore(matchingAlien.word.length * 10);
+
+      // Calculate new words in level before checking completion
+      const newWordsInLevel = wordsInLevel + 1;
+      const maxWords = getMaxWordsForLevel(level);
+
+      // Check if this word completes the level
+      if (newWordsInLevel >= maxWords && !showLevelUp) {
+        // Play level up sound without stopping atmosphere
+        window.playSound?.("levelUp");
+
+        // Show level up animation
+        setShowLevelUp(true);
+
+        // Update game state for next level
         setTimeout(() => {
-          removeAlien(alien.id);
-        }, 1000);
-
-        // Update score and check level completion
-        incrementScore(alien.word.length * 10);
-
-        // Calculate new words in level before checking completion
-        const newWordsInLevel = wordsInLevel + 1;
-        const maxWords = getMaxWordsForLevel(level);
-
-        // Check if this word completes the level
-        if (newWordsInLevel >= maxWords && !showLevelUp) {
-          // Play level up sound without stopping atmosphere
-          window.playSound?.("levelUp");
-
-          // Show level up animation
-          setShowLevelUp(true);
-
-          // Update game state for next level
-          setTimeout(() => {
-            setLevel(level + 1);
-            setWordsInLevel(0);
-            setGameSpeed(getSpawnIntervalForLevel(level + 1));
-          }, 500);
-        } else {
-          // If level isn't complete, just increment words in level
-          setWordsInLevel(newWordsInLevel);
-        }
-
-        setCurrentInput("");
-        e.target.value = "";
+          setLevel(level + 1);
+          setWordsInLevel(0);
+          setGameSpeed(getSpawnIntervalForLevel(level + 1));
+        }, 500);
+      } else {
+        // If level isn't complete, just increment words in level
+        setWordsInLevel(newWordsInLevel);
       }
-    });
+
+      // Apply slow time effect to alien speed
+      const hasSlowTime = activePowerUps.some(
+        (p: ActivePowerUp) => p.type === "slowTime"
+      );
+      if (hasSlowTime) {
+        matchingAlien.speed *= 0.5; // Slow the alien down
+      }
+
+      setCurrentInput("");
+      e.target.value = "";
+    }
   };
 
   // Check for game over
@@ -233,6 +264,10 @@ export default function WordBlastGame() {
             score={score}
             lives={lives}
           />
+          {powerUps.map((powerUp) => (
+            <PowerUp key={powerUp.id} powerUp={powerUp} />
+          ))}
+          <ActivePowerUps activePowerUps={activePowerUps} />
           {showLevelUp && (
             <LevelUpEffect
               level={level}
