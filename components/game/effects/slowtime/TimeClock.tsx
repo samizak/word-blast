@@ -23,21 +23,6 @@ const TimeClock: React.FC = () => {
         }}
       />
 
-      {/* Clock Markers */}
-      {[...Array(12)].map((_, i) => (
-        <div
-          key={i}
-          className="absolute w-1 h-4"
-          style={{
-            background: "rgba(0, 255, 255, 0.6)",
-            left: "50%",
-            top: "0",
-            transformOrigin: "bottom center",
-            transform: `translateX(-50%) rotate(${i * 30}deg)`,
-          }}
-        />
-      ))}
-
       {/* Reverse-spinning Hour Hand */}
       <div
         className="absolute w-1.5 h-40"

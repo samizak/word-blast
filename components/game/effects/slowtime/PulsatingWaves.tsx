@@ -10,8 +10,8 @@ const PulsatingWaves: React.FC = () => {
           style={{
             width: "300px",
             height: "300px",
-            left: "-70px", // (300px - 160px) / 2
-            top: "-70px", // (300px - 160px) / 2
+            left: "-70px",
+            top: "-70px",
             border: "2px solid rgba(0, 255, 255, 0.4)",
             borderRadius: "50%",
             animation: `slow-wave ${2 + i * 0.5}s ease-out infinite`,
