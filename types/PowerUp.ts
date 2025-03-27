@@ -30,4 +30,5 @@ export const POWER_UP_CONFIG = {
     probability: 0.1,
     slowFactor: 0.1,
   },
+  spawnInterval: 15000, // Added spawnInterval property (milliseconds)
 };
