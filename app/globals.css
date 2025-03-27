@@ -206,9 +206,6 @@ body {
 
 /* Find the mute-button class and update it */
 .mute-button {
-  position: absolute;
-  top: 20px;
-  right: 20px;
   background: rgba(0, 0, 0, 0.5);
   border: 2px solid var(--game-accent);
   border-radius: 50%;
