@@ -29,6 +29,6 @@ export const POWER_UP_CONFIG = {
     word: "SLOW",
     color: "#9933ff", // Purple
     probability: 0.1,
-    slowFactor: 0.5, // Reduces speed by 50%
+    slowFactor: 0.1, // Reduces speed to 10% (90% reduction)
   },
 };

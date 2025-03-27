@@ -96,7 +96,7 @@ export function useAliens(
 
     setAliens((prev) => [...prev, newAlien]);
     setWordsInLevel(wordsInLevel + 1);
-  }, [gameState, level, wordsInLevel, aliens.length, getMaxWordsForLevel, getAlienSpeedForLevel, setWordsInLevel]);
+  }, [gameState, level, wordsInLevel, aliens.length, getMaxWordsForLevel, getAlienSpeedForLevel, setWordsInLevel, gameContainerRef]);
 
   const removeAlien = useCallback((alienId: number) => {
     setAliens((prev) => prev.filter((alien) => alien.id !== alienId));
@@ -112,43 +112,55 @@ export function useAliens(
 
   // Memoize the update function for alien positions
   const updateAlienPositions = useCallback(() => {
-    setAliens((prev) => {
-      const updated = prev.map((alien) => ({
-        ...alien,
-        y: alien.y + alien.speed,
-      }));
-
-      const bottomAliens = updated.filter(
-        (alien) =>
+    if (gameState !== "playing") return;
+  
+    setAliens((prevAliens) => {
+      const updatedAliens = prevAliens.map((alien: Alien) => {
+        // Check if slow time is active
+        const hasSlowTime = activePowerUps.some(
+          (p) => p.type === "slowTime"
+        );
+        
+        // Apply slow factor if power-up is active
+        const speedMultiplier = hasSlowTime ? 0.1 : 1;
+        
+        return {
+          ...alien,
+          y: alien.y + alien.speed * speedMultiplier,
+        };
+      });
+  
+      const bottomAliens = updatedAliens.filter(
+        (alien: Alien) =>
           alien.y > (gameContainerRef.current?.clientHeight || 600) - 100 &&
           !alien.isCompleted &&
           !processedBottomAliensRef.current.has(alien.id)
       );
-
+    
       if (bottomAliens.length > 0) {
         // Mark these aliens as processed to prevent double processing
-        bottomAliens.forEach(alien => {
+        bottomAliens.forEach((alien: Alien) => {
           processedBottomAliensRef.current.add(alien.id);
           markAlienAsCompleted(alien.id);
         });
-
+    
         // Check if shield is active before decrementing lives
         const hasShield = activePowerUps.some(p => p.type === 'shield');
         if (!hasShield) {
           decrementLives(bottomAliens.length);
         }
-
+    
         // Remove the aliens after explosion animation
         setTimeout(() => {
           setAliens(current => 
-            current.filter(alien => !bottomAliens.some(bottomAlien => bottomAlien.id === alien.id))
+            current.filter(alien => !bottomAliens.some((bottomAlien: Alien) => bottomAlien.id === alien.id))
           );
         }, 1000); // Match this with the explosion animation duration
       }
-
-      return updated;
+    
+      return updatedAliens;
     });
-  }, [decrementLives, markAlienAsCompleted, activePowerUps]);
+  }, [gameState, activePowerUps, gameContainerRef, markAlienAsCompleted, decrementLives]);
 
   // Reset processed aliens when game state changes
   useEffect(() => {
@@ -196,4 +208,4 @@ export function useAliens(
   ]);
 
   return returnValue;
-} 
+}

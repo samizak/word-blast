@@ -142,3 +142,39 @@ declare global {
 }
 
 export default SoundManager;
+
+// Add this to your sound definitions if it doesn't exist
+const soundEffects = {
+  laser: {
+    src: "/sounds/laser.mp3",
+    volume: 0.5,
+  },
+  explosion: {
+    src: "/sounds/explosion.mp3",
+    volume: 0.5,
+  },
+  levelUp: {
+    src: "/sounds/levelUp.mp3",
+    volume: 0.5,
+  },
+  gameOver: {
+    src: "/sounds/gameOver.mp3",
+    volume: 0.5,
+  },
+  countdown: {
+    src: "/sounds/countdown.mp3",
+    volume: 0.5,
+  },
+  go: {
+    src: "/sounds/go.mp3",
+    volume: 0.5,
+  },
+  atmosphere: {
+    src: "/sounds/atmosphere.mp3",
+    volume: 0.5,
+  },
+  slowTime: {
+    src: "/sounds/slow-time.mp3", // Make sure this file exists
+    volume: 0.5,
+  },
+};
