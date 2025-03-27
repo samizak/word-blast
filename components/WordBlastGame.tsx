@@ -103,21 +103,28 @@ export default function WordBlastGame() {
   useEffect(() => {
     if (gameState === "countdown") {
       if (countdown > 0) {
-        if (canPlayCountdownSound.current) {
-          window.playSound?.("countdown");
-          canPlayCountdownSound.current = false;
-        }
+        const soundTimer = setTimeout(() => {
+          if (canPlayCountdownSound.current) {
+            window.playSound?.("countdown");
+            canPlayCountdownSound.current = false;
+          }
+        }, 100);
 
         const timer = setTimeout(() => {
           setCountdown((prev) => prev - 1);
         }, 1000);
 
-        return () => clearTimeout(timer);
+        return () => {
+          clearTimeout(timer);
+          clearTimeout(soundTimer);
+        };
       } else {
-        window.playSound?.("levelUp");
-        window.playLoopingSound?.("atmosphere");
+        const timer = setTimeout(() => {
+          window.playSound?.("levelUp");
+          setTimeout(() => {
+            window.playLoopingSound?.("atmosphere");
+          }, 200);
 
-        const startGameTimer = setTimeout(() => {
           setGameState("playing");
           generateAlien();
           if (inputRef.current) {
@@ -125,7 +132,7 @@ export default function WordBlastGame() {
           }
         }, 800);
 
-        return () => clearTimeout(startGameTimer);
+        return () => clearTimeout(timer);
       }
     }
   }, [gameState, countdown]);
@@ -207,7 +214,10 @@ export default function WordBlastGame() {
       .toString(36)
       .substr(2, 9)}`;
 
-    window.playSound?.("laser");
+    // Play laser sound with slight delay
+    setTimeout(() => {
+      window.playSound?.("laser");
+    }, 50);
 
     setEffects((prev) => [
       ...prev,
@@ -222,7 +232,10 @@ export default function WordBlastGame() {
     ]);
 
     setTimeout(() => {
-      window.playSound?.("explosion");
+      // Play explosion sound with slight delay
+      setTimeout(() => {
+        window.playSound?.("explosion");
+      }, 50);
 
       setEffects((prev) => [
         ...prev,
@@ -296,29 +309,29 @@ export default function WordBlastGame() {
     });
   };
 
-  // Start atmosphere sound when countdown reaches "GO!"
+  // Clean up sounds when component unmounts or game state changes
   useEffect(() => {
-    if (countdown === "GO!") {
-      window.playLoopingSound?.("atmosphere");
-    }
-  }, [countdown]);
+    return () => {
+      window.stopLoopingSound?.("atmosphere");
+    };
+  }, []);
 
-  // Stop atmosphere sound when game is over
+  // Handle game state changes for sounds
   useEffect(() => {
     if (gameState === "gameOver") {
       window.stopLoopingSound?.("atmosphere");
+      setTimeout(() => {
+        window.playSound?.("gameOver");
+      }, 100);
     }
   }, [gameState]);
 
-  // Add an effect to handle level changes
+  // Remove the redundant countdown sound effect since it's handled in the countdown useEffect
   useEffect(() => {
-    if (showLevelUp) {
-      const timer = setTimeout(() => {
-        setShowLevelUp(false);
-      }, 2000); // Match this with the LevelUpEffect duration
-      return () => clearTimeout(timer);
+    if (countdown === 0) {
+      // Removed duplicate atmosphere sound start
     }
-  }, [showLevelUp]);
+  }, [countdown]);
 
   // Update alien positions
   useEffect(() => {
@@ -395,6 +408,16 @@ export default function WordBlastGame() {
       }
     }
   }, [isMuted, gameState]);
+
+  // Add an effect to handle level changes
+  useEffect(() => {
+    if (showLevelUp) {
+      const timer = setTimeout(() => {
+        setShowLevelUp(false);
+      }, 2000); // Match this with the LevelUpEffect duration
+      return () => clearTimeout(timer);
+    }
+  }, [showLevelUp]);
 
   return (
     <div className="game-container" ref={gameContainerRef}>
