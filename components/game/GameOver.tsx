@@ -13,12 +13,10 @@ export default function GameOver({ level, score, onPlayAgain }: GameOverProps) {
     level: number;
   } | null>(null);
 
-  // Initialize high score on client side only
   useEffect(() => {
     setHighestScore(getHighestScore());
   }, []);
 
-  // Save the score if it's higher than the current high score
   useEffect(() => {
     if (!highestScore || score > highestScore.score) {
       saveHighScore(score, level);
@@ -28,7 +26,6 @@ export default function GameOver({ level, score, onPlayAgain }: GameOverProps) {
 
   return (
     <div className="flex flex-col items-center justify-center h-full text-center space-y-8">
-      {/* Game Over Title */}
       <div
         style={{
           color: "#ff0066",
@@ -43,7 +40,6 @@ export default function GameOver({ level, score, onPlayAgain }: GameOverProps) {
         Game Over
       </div>
 
-      {/* Score Container */}
       <div
         style={{
           padding: "2rem 3rem",
@@ -90,7 +86,6 @@ export default function GameOver({ level, score, onPlayAgain }: GameOverProps) {
         </div>
       </div>
 
-      {/* Play Again Button */}
       <button
         onClick={onPlayAgain}
         style={{

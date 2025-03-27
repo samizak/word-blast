@@ -60,7 +60,6 @@ export default function GameStats({ level, score, lives }: GameStatsProps) {
         zIndex: 1000,
       }}
     >
-      {/* Level Display */}
       <div
         style={{
           display: "flex",
@@ -92,7 +91,6 @@ export default function GameStats({ level, score, lives }: GameStatsProps) {
         </div>
       </div>
 
-      {/* Score Display */}
       <div
         style={{
           display: "flex",
@@ -123,7 +121,6 @@ export default function GameStats({ level, score, lives }: GameStatsProps) {
         </div>
       </div>
 
-      {/* High Score Display */}
       {highestScore && (
         <div
           style={{
@@ -156,7 +153,6 @@ export default function GameStats({ level, score, lives }: GameStatsProps) {
         </div>
       )}
 
-      {/* Lives Display */}
       <div
         style={{
           display: "flex",

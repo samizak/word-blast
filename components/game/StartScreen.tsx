@@ -11,14 +11,12 @@ export default function StartScreen({ onStartGame }: StartScreenProps) {
     level: number;
   } | null>(null);
 
-  // Initialize high score on client side only
   useEffect(() => {
     setHighestScore(getHighestScore());
   }, []);
 
   return (
     <div className="flex flex-col items-center justify-center h-full">
-      {/* Title Box */}
       <div
         className="relative mb-12"
         style={{
@@ -32,7 +30,6 @@ export default function StartScreen({ onStartGame }: StartScreenProps) {
           `,
         }}
       >
-        {/* Corner decorations */}
         <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-cyan-500" />
         <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-cyan-500" />
         <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-cyan-500" />
@@ -49,7 +46,6 @@ export default function StartScreen({ onStartGame }: StartScreenProps) {
         </h1>
       </div>
 
-      {/* High Score Box */}
       {highestScore && (
         <div
           className="mb-12 relative"
@@ -64,7 +60,6 @@ export default function StartScreen({ onStartGame }: StartScreenProps) {
             `,
           }}
         >
-          {/* Corner decorations */}
           <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-yellow-500" />
           <div className="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-yellow-500" />
           <div className="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-yellow-500" />
@@ -96,7 +91,6 @@ export default function StartScreen({ onStartGame }: StartScreenProps) {
         </div>
       )}
 
-      {/* Start Button */}
       <button
         onClick={onStartGame}
         className="text-2xl px-8 py-4 relative cursor-pointer"

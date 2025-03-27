@@ -22,12 +22,10 @@ export default function WordAlien({
   useEffect(() => {
     if (isCompleted && !showExplosion) {
       setShowExplosion(true);
-      // Play explosion sound
       window.playSound?.("explosion");
     }
   }, [isCompleted, showExplosion]);
 
-  // Array of planet types
   const planetTypes = [
     "rocky",
     "gas",
@@ -37,12 +35,9 @@ export default function WordAlien({
     "ringed",
   ] as const;
 
-  // Use the word's first character to deterministically select a planet type
-  // This ensures the same word always gets the same planet
   const planetIndex = word.charCodeAt(0) % planetTypes.length;
   const planetType = planetTypes[planetIndex];
 
-  // Base size is 80, but we'll let PlanetShape component handle the dynamic sizing
   const baseSize = 80;
 
   return (

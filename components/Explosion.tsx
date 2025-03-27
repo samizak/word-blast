@@ -16,11 +16,9 @@ export default function Explosion({
   const [frame, setFrame] = useState(0);
   const [visible, setVisible] = useState(true);
 
-  // Define explosion colors
   const colors = ["#ff0000", "#ff7700", "#ffff00", "#ffffff"];
 
   useEffect(() => {
-    // Animate the explosion
     const framesCount = 5;
     const frameInterval = duration / framesCount;
 
@@ -40,7 +38,6 @@ export default function Explosion({
 
   if (!visible) return null;
 
-  // Calculate explosion properties based on current frame
   const scale = 0.5 + (frame / 5) * 1.5;
   const opacity = 1 - (frame / 5) * 0.8;
 
@@ -55,7 +52,6 @@ export default function Explosion({
         zIndex: 200,
       }}
     >
-      {/* Multiple explosion particles */}
       {colors.map((color, i) => (
         <div
           key={i}

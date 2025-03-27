@@ -58,14 +58,12 @@ const GamePlayArea: React.FC<GamePlayAreaProps> = ({
 }) => {
   const [playerPosition, setPlayerPosition] = useState({ x: 0, y: 0 });
 
-  // Update player position for power-up effects
   useEffect(() => {
     const updatePlayerPosition = () => {
       if (playerRef.current && gameAreaRef.current) {
         const playerRect = playerRef.current.getBoundingClientRect();
         const gameAreaRect = gameAreaRef.current.getBoundingClientRect();
 
-        // Calculate position relative to game area
         setPlayerPosition({
           x: playerRect.left - gameAreaRect.left + playerRect.width / 2,
           y: playerRect.top - gameAreaRect.top + playerRect.height / 2,
@@ -74,7 +72,7 @@ const GamePlayArea: React.FC<GamePlayAreaProps> = ({
     };
 
     updatePlayerPosition();
-    const interval = setInterval(updatePlayerPosition, 50); // Update every 50ms
+    const interval = setInterval(updatePlayerPosition, 50);
     window.addEventListener("resize", updatePlayerPosition);
 
     return () => {
@@ -90,7 +88,6 @@ const GamePlayArea: React.FC<GamePlayAreaProps> = ({
     >
       <GameStats level={level} score={score} lives={lives} />
 
-      {/* Render aliens */}
       {aliens.map((alien) => (
         <WordAlien
           key={alien.id}
@@ -103,7 +100,6 @@ const GamePlayArea: React.FC<GamePlayAreaProps> = ({
         />
       ))}
 
-      {/* Render laser effects */}
       {effects.map((effect) => {
         if (
           effect.type === "laser" &&
@@ -125,12 +121,10 @@ const GamePlayArea: React.FC<GamePlayAreaProps> = ({
         return null;
       })}
 
-      {/* Render player */}
       <div ref={playerRef}>
         <Player />
       </div>
 
-      {/* Render input */}
       <div className="absolute w-full bottom-0 left-0" style={{ zIndex: 9999 }}>
         <GameInput
           currentInput={currentInput}
@@ -139,7 +133,6 @@ const GamePlayArea: React.FC<GamePlayAreaProps> = ({
         />
       </div>
 
-      {/* Power-up effects */}
       <PowerUpEffects
         activePowerUps={activePowerUps}
         playerPosition={playerPosition}
