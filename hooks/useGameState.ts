@@ -5,7 +5,8 @@ export type GameState =
   | "countdown"
   | "playing"
   | "gameOver"
-  | "paused";
+  | "paused"
+  | "levelUp";
 
 type GameStateAction =
   | { type: "START_GAME" }
