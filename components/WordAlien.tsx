@@ -25,7 +25,7 @@ export default function WordAlien({
       // Play explosion sound
       window.playSound?.("explosion");
     }
-  }, [isCompleted]);
+  }, [isCompleted, showExplosion]);
 
   // Array of planet types
   const planetTypes = [
