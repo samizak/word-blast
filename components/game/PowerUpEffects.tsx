@@ -8,10 +8,7 @@ interface PowerUpEffectsProps {
   playerPosition: { x: number; y: number };
 }
 
-const PowerUpEffects: React.FC<PowerUpEffectsProps> = ({
-  activePowerUps,
-  playerPosition,
-}) => {
+const PowerUpEffects: React.FC<PowerUpEffectsProps> = ({ activePowerUps }) => {
   const hasShield = activePowerUps.some((p) => p.type === "shield");
   const hasSlowTime = activePowerUps.some((p) => p.type === "slowTime");
 

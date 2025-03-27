@@ -20,18 +20,6 @@ import ActivePowerUps from "./game/ActivePowerUps";
 import { usePowerUps } from "../hooks/usePowerUps";
 import { PowerUp as PowerUpType, ActivePowerUp } from "../types/PowerUp";
 
-// Game configuration
-const GAME_CONFIG = {
-  baseSpawnInterval: 2000,
-  minSpawnInterval: 600,
-  baseWordsPerLevel: 10,
-  wordsPerLevelIncrease: 5,
-  baseAlienSpeed: 0.5,
-  speedIncreasePerLevel: 0.15,
-  maxSimultaneousWords: 8,
-  pointsPerLevel: 250,
-};
-
 export default function WordBlastGame() {
   const gameContainerRef = useRef<HTMLDivElement>(
     null
@@ -65,7 +53,7 @@ export default function WordBlastGame() {
   } = useGameState();
 
   const { effects, setEffects, createEffects } = useEffects();
-  const { isMuted, setIsMuted, toggleMute } = useSoundManager(gameState);
+  const { isMuted, toggleMute } = useSoundManager(gameState);
   const { powerUps, activePowerUps, activatePowerUp, resetPowerUps } =
     usePowerUps(gameState, gameContainerRef);
 
@@ -98,7 +86,6 @@ export default function WordBlastGame() {
   const {
     aliens,
     setAliens,
-    gameSpeed,
     setGameSpeed,
     generateAlien,
     removeAlien,
@@ -226,7 +213,7 @@ export default function WordBlastGame() {
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [showLevelUp]);
+  }, [showLevelUp, setShowLevelUp]);
 
   // Add keyboard event handler for pause
   useEffect(() => {

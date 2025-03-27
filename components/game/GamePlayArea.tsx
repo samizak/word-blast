@@ -81,7 +81,7 @@ const GamePlayArea: React.FC<GamePlayAreaProps> = ({
       clearInterval(interval);
       window.removeEventListener("resize", updatePlayerPosition);
     };
-  }, []);
+  }, [gameAreaRef, playerRef]);
 
   return (
     <div

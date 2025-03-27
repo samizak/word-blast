@@ -68,7 +68,7 @@ export default function WordExplosion({
 
     // Animation loop
     let animationFrame: number;
-    let startTime = Date.now();
+    const startTime = Date.now();
 
     const animate = () => {
       const currentTime = Date.now();
