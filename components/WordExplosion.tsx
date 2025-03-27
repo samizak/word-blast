@@ -28,20 +28,20 @@ export default function WordExplosion({
 
   useEffect(() => {
     // Create initial particles
-    const numParticles = Math.min(word.length * 5, 30); // Scale with word length
-    const colors = ["#ffff00", "#ff9900", "#ff0000", "#00ffaa", "#ffffff"];
+    const numParticles = Math.min(word.length * 8, 40); // More particles for bigger words
+    const colors = ["#ff0000", "#ff4400", "#ff8800", "#ffcc00", "#ff6600"]; // Red and orange colors
     const newParticles: Particle[] = [];
 
     // Letter particles
     word.split("").forEach((letter, index) => {
       const angle = (index / word.length) * Math.PI * 2;
-      const speed = 2 + Math.random() * 3;
+      const speed = 3 + Math.random() * 4; // Faster initial speed
       newParticles.push({
         x: x,
         y: y,
         vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed - 2, // Initial upward boost
-        size: 20 + Math.random() * 10,
+        vy: Math.sin(angle) * speed - 3, // Stronger upward boost
+        size: 24 + Math.random() * 12, // Bigger particles
         color: colors[Math.floor(Math.random() * colors.length)],
         alpha: 1,
         rotation: Math.random() * 360,
@@ -51,13 +51,13 @@ export default function WordExplosion({
     // Additional spark particles
     for (let i = 0; i < numParticles; i++) {
       const angle = (i / numParticles) * Math.PI * 2 + Math.random() * 0.5;
-      const speed = 1 + Math.random() * 4;
+      const speed = 2 + Math.random() * 5;
       newParticles.push({
         x: x,
         y: y,
         vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed - 1,
-        size: 4 + Math.random() * 4,
+        vy: Math.sin(angle) * speed - 2,
+        size: 6 + Math.random() * 6,
         color: colors[Math.floor(Math.random() * colors.length)],
         alpha: 1,
         rotation: Math.random() * 360,
@@ -85,9 +85,9 @@ export default function WordExplosion({
             ...particle,
             x: particle.x + particle.vx,
             y: particle.y + particle.vy,
-            vy: particle.vy + 0.1, // Gravity
-            alpha: particle.alpha * 0.95,
-            rotation: particle.rotation + particle.vx * 2,
+            vy: particle.vy + 0.15, // Stronger gravity
+            alpha: particle.alpha * 0.97, // Slower fade
+            rotation: particle.rotation + particle.vx * 3, // Faster rotation
           }))
           .filter((particle) => particle.alpha > 0.1)
       );
