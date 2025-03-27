@@ -20,14 +20,24 @@ export function useEffects() {
     if (!playerElement) return;
 
     const gameRect = gameContainerRef.current?.getBoundingClientRect();
-    const playerRect = playerElement.getBoundingClientRect();
-
     if (!gameRect) return;
 
+    // Get player position (center of the spaceship)
+    const playerRect = playerElement.getBoundingClientRect();
     const playerX = playerRect.left - gameRect.left + playerRect.width / 2;
-    const playerY = gameRect.bottom - playerRect.height;
-    const targetX = targetAlien.x + gameRect.left;
-    const targetY = targetAlien.y + gameRect.top;
+    const playerY = playerRect.top - gameRect.top + playerRect.height / 2;
+
+    // Calculate the planet size based on word length (similar to how it's done in PlanetShape)
+    const basePlanetSize = 80;
+    const charWidth = 12;
+    const wordWidth = targetAlien.word.length * charWidth;
+    const padding = 48;
+    const planetSize = Math.max(basePlanetSize, wordWidth + padding);
+    const planetRadius = planetSize / 2;
+
+    // Calculate the center of the alien planet
+    const targetX = targetAlien.x;
+    const targetY = targetAlien.y;
 
     const laserId = `laser-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const explosionId = `explosion-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -81,4 +91,4 @@ export function useEffects() {
   }), [effects, createEffects]);
 
   return returnValue;
-} 
+}
