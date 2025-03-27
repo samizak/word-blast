@@ -131,11 +131,13 @@ const GamePlayArea: React.FC<GamePlayAreaProps> = ({
       </div>
 
       {/* Render input */}
-      <GameInput
-        currentInput={currentInput}
-        onInputChange={onInputChange}
-        inputRef={inputRef}
-      />
+      <div className="absolute w-full bottom-0 left-0" style={{ zIndex: 9999 }}>
+        <GameInput
+          currentInput={currentInput}
+          onInputChange={onInputChange}
+          inputRef={inputRef}
+        />
+      </div>
 
       {/* Power-up effects */}
       <PowerUpEffects
