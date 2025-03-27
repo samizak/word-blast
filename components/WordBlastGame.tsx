@@ -62,6 +62,7 @@ export default function WordBlastGame() {
     null
   ) as RefObject<HTMLInputElement>;
   const playerRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
+  const gameAreaRef = useRef<HTMLDivElement>(null);
   const [currentInput, setCurrentInput] = useState("");
 
   const {
@@ -196,6 +197,11 @@ export default function WordBlastGame() {
     }
   };
 
+  const handleAlienExploded = (id: number) => {
+    setAliens((prevAliens) => prevAliens.filter((alien) => alien.id !== id));
+    setScore(score + 10);
+  };
+
   // Check for game over
   useEffect(() => {
     if (lives <= 0) {
@@ -254,15 +260,18 @@ export default function WordBlastGame() {
       {(gameState === "playing" || gameState === "countdown") && (
         <>
           <GamePlayArea
+            playerRef={playerRef}
             aliens={aliens}
             currentInput={currentInput}
             onInputChange={handleInputChange}
             inputRef={inputRef}
-            playerRef={playerRef}
             effects={effects}
             level={level}
             score={score}
             lives={lives}
+            onAlienExploded={handleAlienExploded}
+            activePowerUps={activePowerUps}
+            gameAreaRef={gameAreaRef}
           />
           {powerUps.map((powerUp) => (
             <PowerUp key={powerUp.id} powerUp={powerUp} />

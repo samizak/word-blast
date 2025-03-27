@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import WordAlien from "../WordAlien";
 import Player from "../Player";
 import GameInput from "./GameInput";
 import GameStats from "./GameStats";
 import Laser from "../Laser";
+import PowerUpEffects from "./PowerUpEffects";
+import { ActivePowerUp } from "../../types/PowerUp";
 
 interface Alien {
   id: number;
@@ -36,9 +38,11 @@ interface GamePlayAreaProps {
   score: number;
   lives: number;
   onAlienExploded?: (id: number) => void;
+  activePowerUps: ActivePowerUp[];
+  gameAreaRef: React.RefObject<HTMLDivElement | null>;
 }
 
-export default function GamePlayArea({
+const GamePlayArea: React.FC<GamePlayAreaProps> = ({
   aliens,
   currentInput,
   onInputChange,
@@ -49,7 +53,36 @@ export default function GamePlayArea({
   score,
   lives,
   onAlienExploded,
-}: GamePlayAreaProps) {
+  activePowerUps,
+  gameAreaRef,
+}) => {
+  const [playerPosition, setPlayerPosition] = useState({ x: 0, y: 0 });
+
+  // Update player position for power-up effects
+  useEffect(() => {
+    const updatePlayerPosition = () => {
+      if (playerRef.current && gameAreaRef.current) {
+        const playerRect = playerRef.current.getBoundingClientRect();
+        const gameAreaRect = gameAreaRef.current.getBoundingClientRect();
+
+        // Calculate position relative to game area
+        setPlayerPosition({
+          x: playerRect.left - gameAreaRect.left + playerRect.width / 2,
+          y: playerRect.top - gameAreaRect.top + playerRect.height / 2,
+        });
+      }
+    };
+
+    updatePlayerPosition();
+    const interval = setInterval(updatePlayerPosition, 50); // Update every 50ms
+    window.addEventListener("resize", updatePlayerPosition);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("resize", updatePlayerPosition);
+    };
+  }, []);
+
   return (
     <div
       className="game-play-area"
@@ -103,6 +136,14 @@ export default function GamePlayArea({
         onInputChange={onInputChange}
         inputRef={inputRef}
       />
+
+      {/* Power-up effects */}
+      <PowerUpEffects
+        activePowerUps={activePowerUps}
+        playerPosition={playerPosition}
+      />
     </div>
   );
-}
+};
+
+export default GamePlayArea;
