@@ -15,18 +15,14 @@ export default function PlanetShape({
   word,
   currentInput = "",
 }: PlanetShapeProps) {
-  // Calculate dynamic size based on word length
-  // Longer words need bigger planets
   const baseSize = minSize;
-  const charWidth = 12; // Increased for more space per character
+  const charWidth = 12;
   const wordWidth = word.length * charWidth;
-  const padding = 48; // Increased padding to ensure text fits
+  const padding = 48;
 
-  // Calculate the size needed to fit the word with padding
   const calculatedSize = Math.max(baseSize, wordWidth + padding);
   const size = calculatedSize;
 
-  // Generate colors based on planet type
   const getPlanetColors = () => {
     switch (type) {
       case "rocky":
@@ -77,7 +73,6 @@ export default function PlanetShape({
   const colors = getPlanetColors();
   const radius = size / 2;
 
-  // Create different planet patterns based on type
   const renderPlanetPattern = () => {
     switch (type) {
       case "rocky":
@@ -223,12 +218,10 @@ export default function PlanetShape({
     }
   };
 
-  // Determine which letters to highlight
   const renderHighlightedWord = () => {
     const lowerWord = word.toLowerCase();
     const lowerInput = currentInput.toLowerCase();
 
-    // Adjust font size calculation to ensure text fits within planet
     const fontSizeMultiplier = Math.min(1.8, 4 / (word.length * 0.15 + 1));
     const fontSize = Math.max(
       12,
