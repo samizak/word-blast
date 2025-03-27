@@ -14,7 +14,7 @@ export default function GameInput({
       ref={inputRef}
       type="text"
       className="input-area"
-      value={currentInput}
+      value={currentInput.trim()}
       onChange={onInputChange}
       placeholder="Type words here"
       autoFocus
