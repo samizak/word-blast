@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Word Blast</title>
+    <meta
+      name="description"
+      content="A fast-paced typing game where you defend against falling word aliens. Test your typing speed and accuracy as you blast through increasingly challenging levels in this sci-fi themed word game."
+    />
+    <link rel="icon" href="spaceship.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="spaceship.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="js/config.js"></script>
+    <script defer src="js/words.js"></script>
+    <script defer src="js/highscore.js"></script>
+    <script defer src="js/sound.js"></script>
+    <script defer src="js/view.js"></script>
+    <script defer src="js/main.js"></script>
+  </head>
+  <body>
+    <div class="star-background" id="stars"></div>
+
+    <main class="game-container" id="game">
+      <div class="top-buttons">
+        <button class="icon-button" id="mute-button" aria-label="Mute"></button>
+        <button
+          class="icon-button"
+          id="pause-button"
+          aria-label="Pause game"
+          hidden
+        ></button>
+      </div>
+
+      <!-- Start screen -->
+      <section class="screen" id="start-screen">
+        <div class="neon-panel title-panel">
+          <span class="corner tl"></span><span class="corner tr"></span>
+          <span class="corner bl"></span><span class="corner br"></span>
+          <h1 class="title">Word Blast</h1>
+        </div>
+
+        <div class="neon-panel high-score-panel" id="start-high-score" hidden>
+          <span class="corner tl"></span><span class="corner tr"></span>
+          <span class="corner bl"></span><span class="corner br"></span>
+          <p class="high-score-label">High Score</p>
+          <p class="high-score-value" id="start-high-score-value"></p>
+          <p class="high-score-level" id="start-high-score-level"></p>
+        </div>
+
+        <button class="start-button" id="start-button">Start Game</button>
+      </section>
+
+      <!-- Countdown -->
+      <div class="countdown-overlay" id="countdown" hidden>
+        <div class="countdown-number" id="countdown-number">3</div>
+      </div>
+
+      <!-- Play area -->
+      <div class="game-play-area" id="play-area" hidden>
+        <div class="game-stats">
+          <div class="stat">
+            <div class="stat-label">Level</div>
+            <div class="stat-value" id="stat-level">1</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Score</div>
+            <div class="stat-value" id="stat-score">0</div>
+          </div>
+          <div class="stat" id="stat-high-score-wrap" hidden>
+            <div class="stat-label">High Score</div>
+            <div class="stat-value" id="stat-high-score"></div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Lives</div>
+            <div class="hearts" id="stat-lives"></div>
+          </div>
+        </div>
+
+        <div class="power-up-indicator" id="active-power-ups"></div>
+
+        <div id="aliens"></div>
+        <div id="power-ups"></div>
+        <div id="lasers"></div>
+
+        <div class="player" id="player">
+          <svg
+            class="spaceship"
+            width="200"
+            height="200"
+            viewBox="0 0 200 200"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <ellipse cx="100" cy="100" rx="60" ry="30" fill="#44cc88" stroke="#00ffaa" stroke-width="2" />
+            <circle cx="100" cy="80" r="20" fill="#aaffee" stroke="#00ffaa" stroke-width="2" opacity="0.8">
+              <animate attributeName="opacity" values="0.7;0.9;0.7" dur="4s" repeatCount="indefinite" />
+            </circle>
+            <ellipse cx="100" cy="80" rx="25" ry="10" fill="none" stroke="#00ffaa" stroke-width="1" stroke-dasharray="5,3" />
+            <rect x="70" y="120" width="60" height="10" rx="5" fill="#333" />
+            <rect x="80" y="130" width="10" height="15" rx="3" fill="#ff5555">
+              <animate attributeName="fill" values="#ff5555;#ff0000;#ff5555" dur="2s" repeatCount="indefinite" />
+            </rect>
+            <rect x="110" y="130" width="10" height="15" rx="3" fill="#ff5555">
+              <animate attributeName="fill" values="#ff5555;#ff0000;#ff5555" dur="2s" repeatCount="indefinite" />
+            </rect>
+            <path d="M70 90 Q100 70 130 90" fill="none" stroke="#00ffaa" stroke-width="2" />
+            <path d="M80 100 Q100 110 120 100" fill="none" stroke="#00ffaa" stroke-width="1.5" />
+            <ellipse cx="100" cy="100" rx="65" ry="35" fill="none" stroke="#00ffaa" stroke-width="1" stroke-opacity="0.3">
+              <animate attributeName="rx" values="65;70;65" dur="3s" repeatCount="indefinite" />
+              <animate attributeName="ry" values="35;40;35" dur="3s" repeatCount="indefinite" />
+            </ellipse>
+          </svg>
+
+          <div class="shield-effect" id="shield-effect" hidden>
+            <div class="shield-ring shield-ring-pulse"></div>
+            <div class="shield-ring shield-ring-rotate">
+              <div class="shield-particle"></div>
+            </div>
+          </div>
+        </div>
+
+        <input
+          type="text"
+          class="game-input"
+          id="game-input"
+          placeholder="Type words here"
+          autocomplete="off"
+          autocapitalize="off"
+          autocorrect="off"
+          spellcheck="false"
+        />
+
+        <div class="slow-time-effect" id="slow-time-effect" hidden></div>
+      </div>
+
+      <!-- Level up -->
+      <div class="level-up" id="level-up" hidden>
+        <div class="level-up-flash"></div>
+        <div class="level-up-text">
+          <div class="level-up-title">Level Up!</div>
+          <div class="level-up-level" id="level-up-level"></div>
+        </div>
+        <div class="level-up-particles"></div>
+      </div>
+
+      <!-- Pause menu -->
+      <div class="pause-menu" id="pause-menu" hidden>
+        <div>
+          <h2 class="pause-title">PAUSED</h2>
+          <div class="pause-panel">
+            <button class="menu-button" id="resume-button" style="--c: var(--game-accent)">RESUME</button>
+            <button class="menu-button" id="restart-button" style="--c: #ffff00">RESTART</button>
+            <button class="menu-button" id="quit-button" style="--c: var(--enemy-color)">QUIT</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game over -->
+      <section class="screen game-over-screen" id="game-over" hidden>
+        <div class="game-over-title">Game Over</div>
+        <div class="game-over-panel">
+          <div class="game-over-line" id="final-score"></div>
+          <div class="game-over-line" id="final-level"></div>
+          <div class="game-over-line gold" id="final-high-score"></div>
+        </div>
+        <button class="play-again-button" id="play-again-button">Play Again</button>
+      </section>
+
+      <!-- Shown if the game loop throws -->
+      <section class="screen error-screen" id="error-screen" hidden>
+        <h2 class="error-title">Something went wrong</h2>
+        <button class="error-button" id="reload-button">Restart Game</button>
+      </section>
+    </main>
+
+    <noscript>Word Blast needs JavaScript to run.</noscript>
+  </body>
+</html>

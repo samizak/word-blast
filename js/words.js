@@ -1,5 +1,7 @@
 // Word lists organized by difficulty level
-const wordLists = [
+window.WordBlast = window.WordBlast || {};
+
+window.WordBlast.wordLists = [
   // Level 1: Simple 3-4 letter words
   [
     "cat",
@@ -248,5 +250,3 @@ const wordLists = [
     "demonstration",
   ],
 ];
-
-export default wordLists;

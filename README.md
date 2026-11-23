@@ -4,7 +4,7 @@ A fast-paced typing game where you defend Earth from alien words by typing them 
 
 <p align="center">
   <a href="https://youtu.be/your-video-id">
-    <img src="public/word-blast-preview.png" alt="Word Blast Game Demo" width="600">
+    <img src="word-blast-preview.png" alt="Word Blast Game Demo" width="600">
   </a>
   <br>
   <em>Click the image to watch the gameplay demo</em>
@@ -38,43 +38,39 @@ You can play Word Blast right now in your browser:
 
 ## 🚀 Getting Started
 
-This is a [Next.js](https://nextjs.org) project. To run it locally:
+Word Blast is a static site with no build step and no dependencies. To run it locally, open `index.html` in your browser, or serve the folder:
 
 ```bash
 # Clone the repository
 git clone https://github.com/yourusername/word-blast.git
 cd word-blast
 
-# Install dependencies
-npm install
-
-# Run the development server
-npm run dev
+# Serve the folder with any static file server
+python3 -m http.server 8000
 ```
 
-Open http://localhost:3000 in your browser to see the game in action.
+Open http://localhost:8000 in your browser to see the game in action.
 
 ## 🛠️ Technologies Used
 
-- Next.js - React framework for the application
-- TypeScript - For type-safe code
-- TailwindCSS - For styling and responsive design
-- React Hooks - For state management and side effects
-- Web Audio API - For sound effects and background music
-- CSS Animations - For visual effects and transitions
+- HTML - A single page, no framework
+- CSS - Styling, animations and visual effects
+- JavaScript - Game loop, state and DOM rendering
+- HTML Audio - For sound effects and background music
 
 ## 🔧 Project Structure
 
     word-blast/
-    ├── app/          # Next.js app directory
-    ├── components/   # React components
-    │   ├── game/     # Game-specific components
-    │   └── common/   # Shared UI components
-    ├── hooks/        # Custom React hooks
-    ├── public/       # Static assets
-    │   └── sounds/   # Game sound effects
-    ├── types/        # TypeScript type definitions
-    └── utils/        # Utility functions
+    ├── index.html    # Page markup for every screen
+    ├── styles.css    # All styling and animations
+    ├── js/
+    │   ├── main.js       # Game state, rules and main loop
+    │   ├── view.js       # DOM builders (planets, lasers, effects)
+    │   ├── config.js     # Tuning values and level formulas
+    │   ├── words.js      # Word lists by difficulty
+    │   ├── sound.js      # Sound effects and background loop
+    │   └── highscore.js  # High scores in localStorage
+    └── sounds/       # Game sound effects
 
 ## 🤝 Contributing
 

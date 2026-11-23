@@ -21,8 +21,8 @@
   <defs>
     <!-- Engine glow gradient -->
     <radialGradient id="engineGlow" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0%" stopColor="#60A5FA" stopOpacity="0.6" />
-      <stop offset="100%" stopColor="#60A5FA" stopOpacity="0" />
+      <stop offset="0%" stop-color="#60A5FA" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#60A5FA" stop-opacity="0" />
     </radialGradient>
     
     <!-- Blur filter for glow effect -->
