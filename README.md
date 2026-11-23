@@ -1,94 +1,91 @@
-# Word Blast 🚀
+# Word Blast
 
-A fast-paced typing game where you defend Earth from alien words by typing them correctly. Blast aliens with your laser typing skills and collect power-ups to help you survive the invasion!
+A browser typing game. Planets carrying words fall toward your ship; type a word to lock on and destroy its planet before it lands.
+
+**[Play it in your browser](https://word-blast-game.vercel.app/)**
 
 <p align="center">
-  <a href="https://youtu.be/your-video-id">
-    <img src="word-blast-preview.png" alt="Word Blast Game Demo" width="600">
-  </a>
-  <br>
-  <em>Click the image to watch the gameplay demo</em>
+  <img src="word-blast-preview.png" alt="Word Blast gameplay" width="600">
 </p>
 
-## 🎮 Play Now!
+## Features
 
-You can play Word Blast right now in your browser:
-[**Play Word Blast**](https://word-blast-game.vercel.app/)
+- **Target lock.** The first letter you type locks on to a planet, and wrong letters are rejected rather than left in the input.
+- **Difficulty modes.** Easy, Normal, Hard, and Zen, a practice mode with no lives and no game over.
+- **Combo multiplier.** Consecutive kills without a typo or a miss multiply your score, up to ×5.
+- **Enemy types.** Fast planets, armoured planets that take two words, and splitters that break into two.
+- **Boss fights.** Every fifth level ends with a boss that you defeat by typing a phrase.
+- **Power-ups.** Shield, slow time, freeze, double score, bomb, and extra life.
+- **Statistics.** Words per minute, accuracy, and best combo after each game, with a top-ten high-score table stored in the browser.
+- **Mobile support.** The layout adapts to small screens and on-screen keyboards.
+- **Settings.** Volume control and a reduced-motion option that turns off screen shake and flashing.
 
-## ✨ Features
+## How to play
 
-- **Fast-paced Typing Action**: Type a word to lock on to its planet and blast it before it reaches your ship
-- **Four Difficulty Modes**: Easy, Normal, Hard, and a Zen practice mode with no lives and no game over
-- **Combo Multiplier**: Chain kills without a typo or a miss to multiply your score up to ×5
-- **Enemy Types**: Fast planets, armoured planets that take two words, and splitters that break into two
-- **Boss Fights**: Every fifth level ends with a boss you defeat by typing a whole phrase
-- **Six Power-ups**: Shield, slow time, freeze, double score, bomb and extra life
-- **Typing Stats**: Words per minute, accuracy and best combo after every game, plus a top-ten high-score table
-- **Plays on Phones**: The layout adapts to small screens and on-screen keyboards
-- **Settings**: Volume control and a reduced-motion option that turns off shake and flashing
+1. Choose a difficulty and select **Start Game**.
+2. Type the word on a planet. The first letter locks on, and finishing the word destroys the planet.
+3. Press Space or Enter to release a target and choose another.
+4. Keep planets away from your ship. Each one that reaches it costs a life and resets your combo.
+5. Type the word under a power-up to collect it.
+6. On every fifth level, type the boss's phrase word by word before it lands.
 
-## 🎮 How to Play
+Press Esc to pause.
 
-1. **Pick a difficulty** and press "Start Game"
-2. **Type words**: the first letter locks on to a planet, and finishing the word destroys it
-3. **Fix mistakes**: wrong letters are rejected, so just keep typing. Press Space or Enter to let go of a target and pick another
-4. **Protect your ship**: every planet that reaches it costs a life and resets your combo
-5. **Collect power-ups** by typing the word under them:
-   - 🛡️ **SHIELD**: planets that reach you do no damage
-   - ⏰ **SLOW**: everything falls at less than half speed
-   - ❄️ **FREEZE**: planets stop completely for a few seconds
-   - ✨ **DOUBLE**: double score
-   - 💣 **BOMB**: destroys every planet on screen
-   - ❤️ **LIFE**: one extra life, up to five
-6. **Beat the boss**: every fifth level, type its phrase word by word before it lands
-7. **Pause** with Esc
+### Power-ups
 
-## 🚀 Getting Started
+| Word     | Effect                                         |
+| -------- | ---------------------------------------------- |
+| `SHIELD` | Planets that reach the ship do no damage.      |
+| `SLOW`   | Everything falls at less than half speed.      |
+| `FREEZE` | Planets stop completely for a few seconds.     |
+| `DOUBLE` | Double score.                                  |
+| `BOMB`   | Destroys every planet on screen.               |
+| `LIFE`   | Adds one life, up to a maximum of five.        |
 
-Word Blast is a static site with no build step and no dependencies. To run it locally, open `index.html` in your browser, or serve the folder:
+## Running locally
+
+Word Blast is a static site with no build step and no dependencies. Clone the repository and open `index.html` in a browser:
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/word-blast.git
+git clone https://github.com/samizak/word-blast.git
 cd word-blast
+```
 
-# Serve the folder with any static file server
+To serve it over HTTP instead, use any static file server:
+
+```bash
 python3 -m http.server 8000
 ```
 
-Open http://localhost:8000 in your browser to see the game in action.
+Then open http://localhost:8000.
 
-## 🛠️ Technologies Used
+## Project structure
 
-- HTML - A single page, no framework
-- CSS - Styling, animations and visual effects
-- JavaScript - Game loop, state and DOM rendering
-- HTML Audio and Web Audio - For sound effects and background music
+```
+word-blast/
+├── index.html        Page markup for every screen
+├── styles.css        Styling and animations
+├── js/
+│   ├── main.js       Game state, rules, and main loop
+│   ├── view.js       DOM builders for planets, lasers, and effects
+│   ├── config.js     Difficulty modes, tuning values, and level formulas
+│   ├── words.js      Word tiers and boss phrases
+│   ├── sound.js      Sound files, synthesized effects, and volume
+│   └── highscore.js  High scores and settings in localStorage
+└── sounds/           Sound effects
+```
 
-## 🔧 Project Structure
+The game is written in plain HTML, CSS, and JavaScript with no framework. Gameplay values such as spawn rates, fall speeds, and power-up durations are in `js/config.js`.
 
-    word-blast/
-    ├── index.html    # Page markup for every screen
-    ├── styles.css    # All styling and animations
-    ├── js/
-    │   ├── main.js       # Game state, rules and main loop
-    │   ├── view.js       # DOM builders (planets, lasers, effects)
-    │   ├── config.js     # Difficulty modes, tuning values, level formulas
-    │   ├── words.js      # Word tiers and boss phrases
-    │   ├── sound.js      # Sound files, synthesized effects, volume
-    │   └── highscore.js  # High scores and settings in localStorage
-    └── sounds/       # Game sound effects
+## Contributing
 
-## 🤝 Contributing
+Contributions are welcome.
 
-Contributions are welcome! If you'd like to contribute:
+1. Fork the repository.
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Commit your changes.
+4. Push the branch and open a pull request.
 
-1. Fork the repository
-2. Create a feature branch ( git checkout -b feature/amazing-feature )
-3. Commit your changes ( git commit -m 'Add some amazing feature' )
-4. Push to the branch ( git push origin feature/amazing-feature )
-5. Open a Pull Request
+## License
 
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+Released under the MIT License. See [LICENSE](LICENSE) for details.
