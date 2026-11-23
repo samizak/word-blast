@@ -17,24 +17,31 @@ You can play Word Blast right now in your browser:
 
 ## ✨ Features
 
-- **Fast-paced Typing Action**: Type words to destroy alien planets before they reach Earth
-- **Progressive Difficulty**: Game gets harder as you advance through levels with more challenging words
-- **Power-ups System**: Collect special power-ups like shields and time-slowing abilities to gain advantages
-- **Visual Effects**: Stunning lasers, explosions, and space-themed visuals enhance the gameplay experience
-- **Sound Effects**: Immersive sound design with background atmosphere and reactive action sounds
-- **Level Progression**: Complete levels by destroying a specific number of aliens, with increasing challenge
-- **Score System**: Earn points based on word length and typing speed
+- **Fast-paced Typing Action**: Type a word to lock on to its planet and blast it before it reaches your ship
+- **Four Difficulty Modes**: Easy, Normal, Hard, and a Zen practice mode with no lives and no game over
+- **Combo Multiplier**: Chain kills without a typo or a miss to multiply your score up to ×5
+- **Enemy Types**: Fast planets, armoured planets that take two words, and splitters that break into two
+- **Boss Fights**: Every fifth level ends with a boss you defeat by typing a whole phrase
+- **Six Power-ups**: Shield, slow time, freeze, double score, bomb and extra life
+- **Typing Stats**: Words per minute, accuracy and best combo after every game, plus a top-ten high-score table
+- **Plays on Phones**: The layout adapts to small screens and on-screen keyboards
+- **Settings**: Volume control and a reduced-motion option that turns off shake and flashing
 
 ## 🎮 How to Play
 
-1. **Start the Game**: Click the "START" button on the main screen
-2. **Type Words**: Type the words displayed on the alien planets to destroy them
-3. **Avoid Invasions**: Don't let the aliens reach the bottom of the screen or you'll lose lives
-4. **Collect Power-ups**: Type special power-up words when they appear:
-   - 🛡️ **SHIELD**: Temporarily protects you from aliens reaching Earth
-   - ⏰ **SLOW**: Slows down all aliens on screen for a limited time
-5. **Complete Levels**: Destroy the required number of aliens to advance to the next level
-6. **Survive**: Try to reach the highest level and score possible!
+1. **Pick a difficulty** and press "Start Game"
+2. **Type words**: the first letter locks on to a planet, and finishing the word destroys it
+3. **Fix mistakes**: wrong letters are rejected, so just keep typing. Press Space or Enter to let go of a target and pick another
+4. **Protect your ship**: every planet that reaches it costs a life and resets your combo
+5. **Collect power-ups** by typing the word under them:
+   - 🛡️ **SHIELD**: planets that reach you do no damage
+   - ⏰ **SLOW**: everything falls at less than half speed
+   - ❄️ **FREEZE**: planets stop completely for a few seconds
+   - ✨ **DOUBLE**: double score
+   - 💣 **BOMB**: destroys every planet on screen
+   - ❤️ **LIFE**: one extra life, up to five
+6. **Beat the boss**: every fifth level, type its phrase word by word before it lands
+7. **Pause** with Esc
 
 ## 🚀 Getting Started
 
@@ -56,7 +63,7 @@ Open http://localhost:8000 in your browser to see the game in action.
 - HTML - A single page, no framework
 - CSS - Styling, animations and visual effects
 - JavaScript - Game loop, state and DOM rendering
-- HTML Audio - For sound effects and background music
+- HTML Audio and Web Audio - For sound effects and background music
 
 ## 🔧 Project Structure
 
@@ -66,10 +73,10 @@ Open http://localhost:8000 in your browser to see the game in action.
     ├── js/
     │   ├── main.js       # Game state, rules and main loop
     │   ├── view.js       # DOM builders (planets, lasers, effects)
-    │   ├── config.js     # Tuning values and level formulas
-    │   ├── words.js      # Word lists by difficulty
-    │   ├── sound.js      # Sound effects and background loop
-    │   └── highscore.js  # High scores in localStorage
+    │   ├── config.js     # Difficulty modes, tuning values, level formulas
+    │   ├── words.js      # Word tiers and boss phrases
+    │   ├── sound.js      # Sound files, synthesized effects, volume
+    │   └── highscore.js  # High scores and settings in localStorage
     └── sounds/       # Game sound effects
 
 ## 🤝 Contributing

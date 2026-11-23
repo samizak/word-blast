@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content" />
     <title>Word Blast</title>
     <meta
       name="description"
@@ -54,7 +54,23 @@
           <p class="high-score-level" id="start-high-score-level"></p>
         </div>
 
+        <div class="difficulty" id="difficulty" role="radiogroup" aria-label="Difficulty">
+          <button class="difficulty-option" data-mode="easy" role="radio">Easy</button>
+          <button class="difficulty-option" data-mode="normal" role="radio">Normal</button>
+          <button class="difficulty-option" data-mode="hard" role="radio">Hard</button>
+          <button class="difficulty-option" data-mode="zen" role="radio">Zen</button>
+        </div>
+        <p class="difficulty-hint" id="difficulty-hint"></p>
+
         <button class="start-button" id="start-button">Start Game</button>
+
+        <div class="start-links">
+          <button class="link-button" id="scores-button">High Scores</button>
+          <button class="link-button" id="settings-button">Settings</button>
+        </div>
+        <p class="start-help">
+          Type a word to lock on and fire. Space lets go of a target. Esc pauses.
+        </p>
       </section>
 
       <!-- Countdown -->
@@ -73,9 +89,9 @@
             <div class="stat-label">Score</div>
             <div class="stat-value" id="stat-score">0</div>
           </div>
-          <div class="stat" id="stat-high-score-wrap" hidden>
-            <div class="stat-label">High Score</div>
-            <div class="stat-value" id="stat-high-score"></div>
+          <div class="stat">
+            <div class="stat-label">Combo</div>
+            <div class="stat-value" id="stat-combo">×1</div>
           </div>
           <div class="stat">
             <div class="stat-label">Lives</div>
@@ -92,8 +108,7 @@
         <div class="player" id="player">
           <svg
             class="spaceship"
-            width="200"
-            height="200"
+            id="ship"
             viewBox="0 0 200 200"
             xmlns="http://www.w3.org/2000/svg"
           >
@@ -133,20 +148,26 @@
           autocomplete="off"
           autocapitalize="off"
           autocorrect="off"
+          enterkeyhint="go"
+          inputmode="text"
+          aria-label="Type the words on the planets"
           spellcheck="false"
         />
 
         <div class="slow-time-effect" id="slow-time-effect" hidden></div>
       </div>
 
-      <!-- Level up -->
-      <div class="level-up" id="level-up" hidden>
-        <div class="level-up-flash"></div>
-        <div class="level-up-text">
-          <div class="level-up-title">Level Up!</div>
-          <div class="level-up-level" id="level-up-level"></div>
+      <!-- Hit / bomb flash -->
+      <div class="flash" id="flash"></div>
+
+      <!-- Level up and boss warning -->
+      <div class="banner" id="banner" hidden>
+        <div class="banner-flash"></div>
+        <div class="banner-text">
+          <div class="banner-title" id="banner-title"></div>
+          <div class="banner-subtitle" id="banner-text"></div>
         </div>
-        <div class="level-up-particles"></div>
+        <div class="banner-particles"></div>
       </div>
 
       <!-- Pause menu -->
@@ -156,6 +177,7 @@
           <div class="pause-panel">
             <button class="menu-button" id="resume-button" style="--c: var(--game-accent)">RESUME</button>
             <button class="menu-button" id="restart-button" style="--c: #ffff00">RESTART</button>
+            <button class="menu-button" id="pause-settings-button" style="--c: #00b8db">SETTINGS</button>
             <button class="menu-button" id="quit-button" style="--c: var(--enemy-color)">QUIT</button>
           </div>
         </div>
@@ -163,14 +185,42 @@
 
       <!-- Game over -->
       <section class="screen game-over-screen" id="game-over" hidden>
-        <div class="game-over-title">Game Over</div>
+        <div class="game-over-title" id="game-over-title">Game Over</div>
+        <div class="new-record" id="new-record" hidden>New High Score!</div>
         <div class="game-over-panel">
-          <div class="game-over-line" id="final-score"></div>
-          <div class="game-over-line" id="final-level"></div>
-          <div class="game-over-line gold" id="final-high-score"></div>
+          <div class="results" id="results"></div>
         </div>
-        <button class="play-again-button" id="play-again-button">Play Again</button>
+        <div class="game-over-actions">
+          <button class="play-again-button" id="play-again-button">Play Again</button>
+          <button class="link-button" id="game-over-scores-button">High Scores</button>
+          <button class="link-button" id="menu-button">Menu</button>
+        </div>
       </section>
+
+      <!-- High scores -->
+      <div class="modal" id="scores-modal" hidden>
+        <div class="modal-panel" role="dialog" aria-label="High scores">
+          <h2 class="modal-title">High Scores</h2>
+          <div class="scores-wrap" id="scores-table"></div>
+          <button class="menu-button" data-close style="--c: var(--game-accent)">CLOSE</button>
+        </div>
+      </div>
+
+      <!-- Settings -->
+      <div class="modal" id="settings-modal" hidden>
+        <div class="modal-panel" role="dialog" aria-label="Settings">
+          <h2 class="modal-title">Settings</h2>
+          <label class="setting">
+            <span>Volume</span>
+            <input type="range" id="volume" min="0" max="100" step="5" />
+          </label>
+          <label class="setting">
+            <span>Reduce motion and flashing</span>
+            <input type="checkbox" id="reduced-motion" />
+          </label>
+          <button class="menu-button" data-close style="--c: var(--game-accent)">CLOSE</button>
+        </div>
+      </div>
 
       <!-- Shown if the game loop throws -->
       <section class="screen error-screen" id="error-screen" hidden>
